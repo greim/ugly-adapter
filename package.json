@@ -1,0 +1,20 @@
+{
+  "name": "yieldme",
+  "version": "1.0.0",
+  "description": "turn any callback into a promise",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --reporter nyan"
+  },
+  "keywords": [
+    "promise", "callback", "es6", "yield", "thenable", "yieldable"
+  ],
+  "author": "gregreimer@gmail.com",
+  "license": "MIT",
+  "dependencies": {
+    "native-or-bluebird": "^1.1.2"
+  },
+  "devDependencies": {
+    "co": "^4.3.1"
+  }
+}
