@@ -1,6 +1,13 @@
 {
   "name": "ugly-adapter",
   "version": "1.0.2",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/greim/ugly-adapter"
+  },
+ "bugs": {
+    "url": "https://github.com/greim/ugly-adapter/issues"
+  },
   "description": "get promises out of standard callback APIs",
   "main": "index.js",
   "scripts": {
