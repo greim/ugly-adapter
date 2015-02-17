@@ -1,78 +1,46 @@
-# Turn any callback into a promise
+# Tool to get promises out of standard callback APIs
 
-The idea of promises as *thenables* is okay, I guess.
-But with generators I'm more excited about promises as *yieldables*.
+**Here:**
+*Where we are now.*
+API methods return `undefined` and accept a callback as the last arg having a signature of `(err, result)`.
 
-The impetus for this lib is that I want to convert error-first-callback functions into promises on the fly, which I can then yield from `co()` and the like (and eventually async/await), *consistently across my codebase*.
-Anyhow, to get a yieldable:
+**There:**
+*Where we want to be.*
+API methods don't require callbacks as the last arg, and instead return promise objects.
 
-## I can either use a wrapper lib...
+This lib is a temporary, ugly, intermediate hack to get from *here* to *there*, until such time as the APIs available to us return promises and don't require callbacks.
+That's all.
 
-...for which there's modules like `mz`
+## Install
 
-```js
-var fs = require('mz/fs')
-co(function*(){
-  var data = yield fs.readFile('data.json', 'utf8')
-})
+```bash
+npm install ugly-adapter
 ```
 
-But since shipping modified versions of libraries isn't scalable, I'll end up using `mz` in some places but not others.
-
-## Or I can manually wrap the lib...
-
-...for which there's modules like `promisify-node`
+## Use
 
 ```js
-var promisify = require('promisify-node');
-var fs = promisify('fs');
-co(function*(){
-  var data = yield fs.readFile('./foo.js', 'utf8')
-})
+var adapt = require('ugly-adapter')
+  , promise = yield adapt(fs.readFile, 'data.text', 'utf8')
 ```
-
-But this makes assumptions about the structure of the lib.
-`fs.exists()` would be mysteriously broken unless they special-cased it, for example.
-And anyway these all feel too magical.
-
-## Or I can use this "yieldme" hack.
-
-```js
-var fs = require('fs')
-  , me = require('yieldme')
-co(function*(){
-  var data = yield me(fs.readFile, './foo.js', 'utf8')
-})
-```
-
-It's explicit, and allows me to apply the same pattern everywhere without performing alchemy on all my dependencies.
 
 # API
 
-## Calling a function.
+## Call a function, return a promise.
 
 ```js
-yield me(someFunc, ...args)
+yield adapt(someFunc, ...args)
 ```
 
-Calls `someFunc(...args)`, best for when `this` is unimportant in the function.
-Returns a promise.
+## Call a method, return a promise
 
 ```js
-var fs = require('fs')
-yield me(fs.readFile, './foo.js')
+var adapt = require('ugly-adapter')
+  , promise = adapt.method(object, methodName, ...args)
 ```
 
-## Calling a method
+## FAQ
 
-```js
-yield me.method(object, methodName, ...args)
-```
-
-Calls `object[methodName](...args)`, best for when `this` is important in the function.
-Returns a promise.
-
-```js
-var client = Client({ token:'xxx', secret:'yyy' })
-var results = yield me.method(client, 'searchUsers', { filter: '*alex*' })
-```
+ 1. **Aren't promises slow?** Yieldme will return [Bluebird](https://www.npmjs.com/package/bluebird) promises if they're available.
+ 2. **Doesn't another lib already do this?** Yes, and lots of other stuff besides. This lib is very minimal.
+ 3. **Wouldn't "pretty" be better?** Native promises *will* happen someday, at which point things can be pretty. When it comes time to refactor my own modules to support that, I don't want to have to unpush a magic button, and until then I'd prefer my code to treat deficiencies in the platform explicitly.

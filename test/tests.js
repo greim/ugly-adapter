@@ -1,6 +1,12 @@
+/*
+ * Copyright (c) 2015 by Greg Reimer <gregreimer@gmail.com>
+ * MIT License. See mit-license.txt for more info.
+ */
+
 var assert = require('assert')
   , co = require('co')
-  , me = require('../index')
+  , adapt = require('../index')
+  , pkg = require('../package')
 
 function say(mess, cb){
   setImmediate(function(){
@@ -30,7 +36,7 @@ function arrayify(){
   })
 }
 
-describe('yieldme', function(){
+describe(pkg.name, function(){
 
   describe('test functions', function(){
 
@@ -77,7 +83,7 @@ describe('yieldme', function(){
     it('should work', function(done){
 
       co(function*(){
-        var m = yield me(say, 'hi')
+        var m = yield adapt(say, 'hi')
         assert.equal(m, 'hi')
         done()
       }).catch(done)
@@ -85,14 +91,14 @@ describe('yieldme', function(){
 
     it('should return a promise', function(){
 
-      var p = me(say, 'hi')
+      var p = adapt(say, 'hi')
       assert.ok(p.then && typeof p.then === 'function', 'not a promise')
     })
 
     it('should pass context', function(done){
 
       co(function*(){
-        var self = yield me(getSelf)
+        var self = yield adapt(getSelf)
         assert.strictEqual(self, global)
         done()
       }).catch(done)
@@ -101,7 +107,7 @@ describe('yieldme', function(){
     it('should pass arguments', function(done){
 
       co(function*(){
-        var array = yield me(arrayify, 'a', 'b', 'c')
+        var array = yield adapt(arrayify, 'a', 'b', 'c')
         assert.deepEqual(array, ['a','b','c'])
         done()
       }).catch(done)
@@ -110,7 +116,7 @@ describe('yieldme', function(){
     it('should error', function(done){
 
       co(function*(){
-        yield me(fail)
+        yield adapt(fail)
         done(new Error('failed to fail'))
       }).catch(function(){
         done()
@@ -124,7 +130,7 @@ describe('yieldme', function(){
 
       co(function*(){
         var fakeLib = { say: say }
-        var m = yield me.method(fakeLib, 'say', 'hi')
+        var m = yield adapt.method(fakeLib, 'say', 'hi')
         assert.equal(m, 'hi')
         done()
       }).catch(done)
@@ -133,7 +139,7 @@ describe('yieldme', function(){
     it('should return a promise', function(){
 
       var fakeLib = { say: say }
-      var p = me.method(fakeLib, 'say', 'hi')
+      var p = adapt.method(fakeLib, 'say', 'hi')
       assert.ok(p.then && typeof p.then === 'function', 'not a promise')
     })
 
@@ -141,7 +147,7 @@ describe('yieldme', function(){
 
       co(function*(){
         var fakeLib = { getSelf: getSelf }
-        var self = yield me.method(fakeLib, 'getSelf')
+        var self = yield adapt.method(fakeLib, 'getSelf')
         assert.strictEqual(self, fakeLib)
         done()
       }).catch(done)
@@ -151,7 +157,7 @@ describe('yieldme', function(){
 
       co(function*(){
         var fakeLib = { arrayify: arrayify }
-        var array = yield me.method(fakeLib, 'arrayify', 'a', 'b', 'c')
+        var array = yield adapt.method(fakeLib, 'arrayify', 'a', 'b', 'c')
         assert.deepEqual(array, ['a','b','c'])
         done()
       }).catch(done)
@@ -161,7 +167,7 @@ describe('yieldme', function(){
 
       co(function*(){
         var fakeLib = { fail: fail }
-        yield me.method(fakeLib, 'fail')
+        yield adapt.method(fakeLib, 'fail')
         done(new Error('failed to fail'))
       }).catch(function(){
         done()

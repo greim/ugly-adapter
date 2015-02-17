@@ -1,13 +1,18 @@
 {
-  "name": "yieldme",
+  "name": "ugly-adapter",
   "version": "1.0.0",
-  "description": "turn any callback into a promise",
+  "description": "get promises out of standard callback APIs",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --reporter nyan"
+    "test": "node node_modules/.bin/mocha --harmony"
   },
   "keywords": [
-    "promise", "callback", "es6", "yield", "thenable", "yieldable"
+    "promise",
+    "callback",
+    "es6",
+    "yield",
+    "thenable",
+    "yieldable"
   ],
   "author": "gregreimer@gmail.com",
   "license": "MIT",
@@ -15,6 +20,7 @@
     "native-or-bluebird": "^1.1.2"
   },
   "devDependencies": {
-    "co": "^4.3.1"
+    "co": "^4.3.1",
+    "mocha": "^2.1.0"
   }
 }
