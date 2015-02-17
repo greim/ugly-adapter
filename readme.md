@@ -8,7 +8,7 @@ API methods return `undefined` and accept a callback as the last arg having a si
 *Where we want to be.*
 API methods don't require callbacks as the last arg, and instead return promise objects.
 
-This lib is a temporary, ugly, intermediate hack to get from *here* to *there*, until such time as the APIs available to us return promises and don't require callbacks.
+This lib is a temporary, ugly, intermediate, necessary, minimal hack to get from *here* to *there*, until such time as the APIs available to us return promises and don't require callbacks.
 That's all.
 
 ## Install
