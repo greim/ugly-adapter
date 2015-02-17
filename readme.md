@@ -44,5 +44,5 @@ var adapt = require('ugly-adapter')
 
  1. **Aren't promises slow?** This lib will return [Bluebird](https://www.npmjs.com/package/bluebird) promises if you've added them to your project, otherwise native. Either way the API is the same. This lib does not however explicitly depend on Bluebird; it has to be reachable by name from your project, in which case it will be auto-detected.
  2. **Doesn't Lib X already do this?** Yes, and lots of other stuff besides. This lib is very minimal. If you're already using Lib X, you should probably use it and not this.
- 3. ***Is es6 required?*** Sort of. Bluebird (see above) or a global `Promise` constructor (which comes as part of es6) is required. If neither are found this lib will bounce down the runway and burst into flames.
+ 3. **Is es6 required?** Sort of. Bluebird (see above) or a global `Promise` constructor (which comes as part of es6) is required. If neither are found this lib will bounce down the runway and burst into flames.
  4. **Wouldn't "pretty" be better?** Native promises will happen someday, at which point things can be pretty. When it comes time to refactor my own modules to support that, I don't want to have to unpush a magic button, and until then I'd prefer my code to be explicit about its hacks and workarounds.
