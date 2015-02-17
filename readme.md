@@ -21,18 +21,19 @@ npm install ugly-adapter
 
 ```js
 var adapt = require('ugly-adapter')
-  , promise = yield adapt(fs.readFile, 'data.text', 'utf8')
+  , promise = adapt(fs.readFile, 'data.text', 'utf8')
 ```
 
 # API
 
-## Call a function, return a promise.
+## Call a bare function, return a promise.
 
 ```js
-yield adapt(someFunc, ...args)
+var adapt = require('ugly-adapter')
+  , promise = adapt(someFunction, ...args)
 ```
 
-## Call a method, return a promise
+## Call a method on an object, return a promise
 
 ```js
 var adapt = require('ugly-adapter')
