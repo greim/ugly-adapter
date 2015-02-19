@@ -6,6 +6,12 @@
 var Promise = require('native-or-bluebird')
   , slice = Array.prototype.slice
 
+/*
+ * Calls with two or fewer args are optimized to avoid allocating
+ * a new array, and subsequently call the function directly instead
+ * of applying an array.
+ */
+
 function methodPromify(target, method, arg0, arg1){
   var chopLength = 2
     , argCount = arguments.length - chopLength;
@@ -54,11 +60,11 @@ function functionPromify(fn, arg0, arg1){
         else resolve(result);
       };
       if (argCount === 2){
-        fn.call(null, arg0, arg1, cb);
+        fn(arg0, arg1, cb);
       } else if (argCount === 1){
-        fn.call(null, arg0, cb);
+        fn(arg0, cb);
       } else if (argCount === 0){
-        fn.call(null, cb);
+        fn(cb);
       }
     });
   }
