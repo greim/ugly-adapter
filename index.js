@@ -7,9 +7,10 @@ var Promise = require('native-or-bluebird')
   , slice = Array.prototype.slice
 
 function methodPromify(target, method, arg0, arg1){
-  var argCount = arguments.length - 2;
+  var chopLength = 2
+    , argCount = arguments.length - chopLength;
   if (argCount > 2){
-    var args = slice.call(arguments, 2);
+    var args = slice.call(arguments, chopLength);
     return new Promise(function(resolve, reject){
       args.push(function(err, result){
         if (err) reject(err);
@@ -35,9 +36,10 @@ function methodPromify(target, method, arg0, arg1){
 }
 
 function functionPromify(fn, arg0, arg1){
-  var argCount = arguments.length - 1;
+  var chopLength = 1
+    , argCount = arguments.length - chopLength;
   if (argCount > 2){
-    var args = slice.call(arguments, 1);
+    var args = slice.call(arguments, chopLength);
     return new Promise(function(resolve, reject){
       args.push(function(err, result){
         if (err) reject(err);
