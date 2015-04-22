@@ -3,6 +3,8 @@
  * MIT License. See mit-license.txt for more info.
  */
 
+'use strict'
+
 var assert = require('assert')
   , co = require('co')
   , adapt = require('../index')
@@ -22,7 +24,6 @@ function getSelf(cb){
 }
 
 function fail(cb){
-  var self = this
   setImmediate(function(){
     cb(new Error('oops'))
   })
@@ -42,7 +43,9 @@ describe('test helpers', function(){
   it('should say()', function(done){
 
     say('hello', function(err, message){
-      if (err) done(err)
+      if (err) {
+        done(err)
+      }
       assert.strictEqual(message, 'hello')
       done()
     })
@@ -52,7 +55,9 @@ describe('test helpers', function(){
 
     var thisThing = {}
     getSelf.call(thisThing, function(err, thatThing){
-      if (err) done(err)
+      if (err) {
+        done(err)
+      }
       assert.strictEqual(thisThing, thatThing)
       done()
     })
@@ -60,7 +65,6 @@ describe('test helpers', function(){
 
   it('should fail()', function(done){
 
-    var thisThing = {}
     fail(function(err){
       assert.ok(err)
       done()
@@ -70,7 +74,9 @@ describe('test helpers', function(){
   it('should arrayify() 0 args', function(done){
 
     arrayify(function(err, array){
-      if (err) done(err)
+      if (err) {
+        done(err)
+      }
       assert.deepEqual(array, [])
       done()
     })
@@ -79,7 +85,9 @@ describe('test helpers', function(){
   it('should arrayify() 1 arg', function(done){
 
     arrayify(1,function(err, array){
-      if (err) done(err)
+      if (err) {
+        done(err)
+      }
       assert.deepEqual(array, [1])
       done()
     })
@@ -88,7 +96,9 @@ describe('test helpers', function(){
   it('should arrayify() 2 args', function(done){
 
     arrayify(1,2,function(err, array){
-      if (err) done(err)
+      if (err) {
+        done(err)
+      }
       assert.deepEqual(array, [1,2])
       done()
     })
@@ -97,7 +107,9 @@ describe('test helpers', function(){
   it('should arrayify() 3 args', function(done){
 
     arrayify(1,2,3,function(err, array){
-      if (err) done(err)
+      if (err) {
+        done(err)
+      }
       assert.deepEqual(array, [1,2,3])
       done()
     })
@@ -106,7 +118,9 @@ describe('test helpers', function(){
   it('should arrayify() 4 args', function(done){
 
     arrayify(1,2,3,4,function(err, array){
-      if (err) done(err)
+      if (err) {
+        done(err)
+      }
       assert.deepEqual(array, [1,2,3,4])
       done()
     })
@@ -115,7 +129,9 @@ describe('test helpers', function(){
   it('should arrayify() falsy args', function(done){
 
     arrayify(null, undefined, false,function(err, array){
-      if (err) done(err)
+      if (err) {
+        done(err)
+      }
       assert.deepEqual(array, [null, undefined, false])
       done()
     })
@@ -141,11 +157,11 @@ describe(pkg.name, function(){
       assert.ok(p.then && typeof p.then === 'function', 'not a promise')
     })
 
-    it('should pass global context', function(done){
+    it('should pass undefined context (in strict mode)', function(done){
 
       co(function*(){
         var self = yield adapt(getSelf)
-        assert.strictEqual(self, global)
+        assert.strictEqual(self, undefined)
         done()
       }).catch(done)
     })
@@ -208,6 +224,46 @@ describe(pkg.name, function(){
 
       co(function*(){
         yield adapt(fail)
+        done(new Error('failed to fail'))
+      }).catch(function(){
+        done()
+      })
+    })
+
+    it('should curry', function(done){
+
+      co(function*(){
+        var curried = adapt.curry(say, 'hi')
+        var m = yield curried()
+        assert.equal(m, 'hi')
+        done()
+      }).catch(done)
+    })
+
+    it('should curry just one arg', function(done){
+
+      co(function*(){
+        var curried = adapt.curry(say)
+        var m = yield curried('hi')
+        assert.equal(m, 'hi')
+        done()
+      }).catch(done)
+    })
+
+    it('should curry no args', function(done){
+
+      co(function*(){
+        var curried = adapt.curry()
+        var m = yield curried(say, 'hi')
+        assert.equal(m, 'hi')
+        done()
+      }).catch(done)
+    })
+
+    it('curry should error', function(done){
+
+      co(function*(){
+        yield adapt.curry()(fail)
         done(new Error('failed to fail'))
       }).catch(function(){
         done()
@@ -309,6 +365,61 @@ describe(pkg.name, function(){
       co(function*(){
         var fakeLib = { fail: fail }
         yield adapt.method(fakeLib, 'fail')
+        done(new Error('failed to fail'))
+      }).catch(function(){
+        done()
+      })
+    })
+
+    it('should curry', function(done){
+
+      co(function*(){
+        var fakeLib = { say: say }
+        var curried = adapt.method.curry(fakeLib, 'say', 'hi')
+        var m = yield curried()
+        assert.equal(m, 'hi')
+        done()
+      }).catch(done)
+    })
+
+    it('should curry just two args', function(done){
+
+      co(function*(){
+        var fakeLib = { say: say }
+        var curried = adapt.method.curry(fakeLib, 'say')
+        var m = yield curried('hi')
+        assert.equal(m, 'hi')
+        done()
+      }).catch(done)
+    })
+
+    it('should curry just one arg', function(done){
+
+      co(function*(){
+        var fakeLib = { say: say }
+        var curried = adapt.method.curry(fakeLib)
+        var m = yield curried('say', 'hi')
+        assert.equal(m, 'hi')
+        done()
+      }).catch(done)
+    })
+
+    it('should curry no args', function(done){
+
+      co(function*(){
+        var fakeLib = { say: say }
+        var curried = adapt.method.curry()
+        var m = yield curried(fakeLib, 'say', 'hi')
+        assert.equal(m, 'hi')
+        done()
+      }).catch(done)
+    })
+
+    it('curry should error', function(done){
+
+      co(function*(){
+        var fakeLib = { fail: fail }
+        yield adapt.curry()(fakeLib, 'fail')
         done(new Error('failed to fail'))
       }).catch(function(){
         done()

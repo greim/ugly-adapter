@@ -16,61 +16,74 @@ var MyPromise = require('native-or-bluebird')
 
 function methodPromify(target, method, arg0, arg1){
   var chopLength = 2
-    , argCount = arguments.length - chopLength;
+    , argCount = arguments.length - chopLength
   if (argCount > 2){
-    var args = slice.call(arguments, chopLength);
+    var args = slice.call(arguments, chopLength)
     return new MyPromise(function(resolve, reject){
       args.push(function(err, result){
-        if (err) { reject(err); }
-        else { resolve(result); }
-      });
-      target[method].apply(target, args);
-    });
+        if (err) { reject(err) }
+        else { resolve(result) }
+      })
+      target[method].apply(target, args)
+    })
   } else {
     return new MyPromise(function(resolve, reject){
       var cb = function(err, result){
-        if (err) { reject(err); }
-        else { resolve(result); }
-      };
-      if (argCount === 2){
-        target[method].call(target, arg0, arg1, cb);
-      } else if (argCount === 1){
-        target[method].call(target, arg0, cb);
-      } else if (argCount === 0){
-        target[method].call(target, cb);
+        if (err) { reject(err) }
+        else { resolve(result) }
       }
-    });
+      if (argCount === 2){
+        target[method].call(target, arg0, arg1, cb)
+      } else if (argCount === 1){
+        target[method].call(target, arg0, cb)
+      } else if (argCount === 0){
+        target[method].call(target, cb)
+      }
+    })
   }
 }
 
 function functionPromify(fn, arg0, arg1){
   var chopLength = 1
-    , argCount = arguments.length - chopLength;
+    , argCount = arguments.length - chopLength
   if (argCount > 2){
-    var args = slice.call(arguments, chopLength);
+    var args = slice.call(arguments, chopLength)
     return new MyPromise(function(resolve, reject){
       args.push(function(err, result){
-        if (err) { reject(err); }
-        else { resolve(result); }
-      });
-      fn.apply(null, args);
-    });
+        if (err) { reject(err) }
+        else { resolve(result) }
+      })
+      fn.apply(null, args)
+    })
   } else {
     return new MyPromise(function(resolve, reject){
       var cb = function(err, result){
-        if (err) { reject(err); }
-        else { resolve(result); }
-      };
-      if (argCount === 2){
-        fn(arg0, arg1, cb);
-      } else if (argCount === 1){
-        fn(arg0, cb);
-      } else if (argCount === 0){
-        fn(cb);
+        if (err) { reject(err) }
+        else { resolve(result) }
       }
-    });
+      if (argCount === 2){
+        fn(arg0, arg1, cb)
+      } else if (argCount === 1){
+        fn(arg0, cb)
+      } else if (argCount === 0){
+        fn(cb)
+      }
+    })
   }
 }
 
-module.exports = functionPromify;
-module.exports.method = methodPromify;
+function currier() {
+  var curriedArgs = slice.call(arguments)
+    , fn = this
+  return function(){
+    var remainingArgs = slice.call(arguments)
+      , args = curriedArgs.concat(remainingArgs)
+    return fn.apply(null, args)
+  }
+}
+
+methodPromify.curry = currier.bind(methodPromify)
+functionPromify.curry = currier.bind(functionPromify)
+
+module.exports = functionPromify
+module.exports.method = methodPromify
