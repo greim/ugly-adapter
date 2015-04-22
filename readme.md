@@ -18,14 +18,8 @@ var adapt = require('ugly-adapter')
 ```
 
 ```js
-// helper to make partial application less verbose
-
-// less typing
+// helper for partial application
 var read = adapt.part(fs.readFile)
-  , promise = read('data.txt', 'utf8')
-
-// more typing
-var read = adapt.bind(null, fs.readFile)
   , promise = read('data.txt', 'utf8')
 ```
 
