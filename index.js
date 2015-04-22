@@ -3,7 +3,9 @@
  * MIT License. See mit-license.txt for more info.
  */
 
-var Promise = require('native-or-bluebird')
+'use strict'
+
+var MyPromise = require('native-or-bluebird')
   , slice = Array.prototype.slice
 
 /*
@@ -17,18 +19,18 @@ function methodPromify(target, method, arg0, arg1){
     , argCount = arguments.length - chopLength;
   if (argCount > 2){
     var args = slice.call(arguments, chopLength);
-    return new Promise(function(resolve, reject){
+    return new MyPromise(function(resolve, reject){
       args.push(function(err, result){
-        if (err) reject(err);
-        else resolve(result);
+        if (err) { reject(err); }
+        else { resolve(result); }
       });
       target[method].apply(target, args);
     });
   } else {
-    return new Promise(function(resolve, reject){
+    return new MyPromise(function(resolve, reject){
       var cb = function(err, result){
-        if (err) reject(err);
-        else resolve(result);
+        if (err) { reject(err); }
+        else { resolve(result); }
       };
       if (argCount === 2){
         target[method].call(target, arg0, arg1, cb);
@@ -46,18 +48,18 @@ function functionPromify(fn, arg0, arg1){
     , argCount = arguments.length - chopLength;
   if (argCount > 2){
     var args = slice.call(arguments, chopLength);
-    return new Promise(function(resolve, reject){
+    return new MyPromise(function(resolve, reject){
       args.push(function(err, result){
-        if (err) reject(err);
-        else resolve(result);
+        if (err) { reject(err); }
+        else { resolve(result); }
       });
       fn.apply(null, args);
     });
   } else {
-    return new Promise(function(resolve, reject){
+    return new MyPromise(function(resolve, reject){
       var cb = function(err, result){
-        if (err) reject(err);
-        else resolve(result);
+        if (err) { reject(err); }
+        else { resolve(result); }
       };
       if (argCount === 2){
         fn(arg0, arg1, cb);
@@ -68,7 +70,7 @@ function functionPromify(fn, arg0, arg1){
       }
     });
   }
-};
+}
 
 module.exports = functionPromify;
 module.exports.method = methodPromify;
