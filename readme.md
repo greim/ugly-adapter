@@ -14,13 +14,13 @@ npm install ugly-adapter
 
 ```js
 var adapt = require('ugly-adapter')
-  , promise = adapt(fs.readFile, 'data.text', 'utf8')
+  , promise = adapt(fs.readFile, './data.txt', 'utf8')
 ```
 
 ```js
 // helper for partial application
 var read = adapt.part(fs.readFile)
-  , promise = read('data.txt', 'utf8')
+  , promise = read('./data.txt', 'utf8')
 ```
 
 # API
@@ -35,6 +35,7 @@ var adapt = require('ugly-adapter')
 ## Call a method on an object
 
 ```js
+// method sees proper 'this'
 var adapt = require('ugly-adapter')
   , promise = adapt.method(object, methodName, ...args)
 ```
