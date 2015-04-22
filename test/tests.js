@@ -233,7 +233,7 @@ describe(pkg.name, function(){
     it('should partially apply', function(done){
 
       co(function*(){
-        var applied = adapt.partial(say, 'hi')
+        var applied = adapt.part(say, 'hi')
         var m = yield applied()
         assert.equal(m, 'hi')
         done()
@@ -243,7 +243,7 @@ describe(pkg.name, function(){
     it('should partially apply just one arg', function(done){
 
       co(function*(){
-        var applied = adapt.partial(say)
+        var applied = adapt.part(say)
         var m = yield applied('hi')
         assert.equal(m, 'hi')
         done()
@@ -253,7 +253,7 @@ describe(pkg.name, function(){
     it('should partially apply no args', function(done){
 
       co(function*(){
-        var applied = adapt.partial()
+        var applied = adapt.part()
         var m = yield applied(say, 'hi')
         assert.equal(m, 'hi')
         done()
@@ -263,7 +263,7 @@ describe(pkg.name, function(){
     it('partial application should error', function(done){
 
       co(function*(){
-        yield adapt.partial()(fail)
+        yield adapt.part()(fail)
         done(new Error('failed to fail'))
       }).catch(function(){
         done()
@@ -375,7 +375,7 @@ describe(pkg.name, function(){
 
       co(function*(){
         var fakeLib = { say: say }
-        var applied = adapt.method.partial(fakeLib, 'say', 'hi')
+        var applied = adapt.method.part(fakeLib, 'say', 'hi')
         var m = yield applied()
         assert.equal(m, 'hi')
         done()
@@ -386,7 +386,7 @@ describe(pkg.name, function(){
 
       co(function*(){
         var fakeLib = { say: say }
-        var applied = adapt.method.partial(fakeLib, 'say')
+        var applied = adapt.method.part(fakeLib, 'say')
         var m = yield applied('hi')
         assert.equal(m, 'hi')
         done()
@@ -397,7 +397,7 @@ describe(pkg.name, function(){
 
       co(function*(){
         var fakeLib = { say: say }
-        var applied = adapt.method.partial(fakeLib)
+        var applied = adapt.method.part(fakeLib)
         var m = yield applied('say', 'hi')
         assert.equal(m, 'hi')
         done()
@@ -408,7 +408,7 @@ describe(pkg.name, function(){
 
       co(function*(){
         var fakeLib = { say: say }
-        var applied = adapt.method.partial()
+        var applied = adapt.method.part()
         var m = yield applied(fakeLib, 'say', 'hi')
         assert.equal(m, 'hi')
         done()
@@ -419,7 +419,7 @@ describe(pkg.name, function(){
 
       co(function*(){
         var fakeLib = { fail: fail }
-        yield adapt.partial()(fakeLib, 'fail')
+        yield adapt.part()(fakeLib, 'fail')
         done(new Error('failed to fail'))
       }).catch(function(){
         done()

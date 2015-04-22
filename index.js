@@ -82,8 +82,8 @@ function partialApplier() {
   }
 }
 
-methodPromify.partial = partialApplier.bind(methodPromify)
-functionPromify.partial = partialApplier.bind(functionPromify)
+methodPromify.part = partialApplier.bind(methodPromify)
+functionPromify.part = partialApplier.bind(functionPromify)
 
 module.exports = functionPromify
 module.exports.method = methodPromify

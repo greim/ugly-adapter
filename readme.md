@@ -17,6 +17,18 @@ var adapt = require('ugly-adapter')
   , promise = adapt(fs.readFile, 'data.text', 'utf8')
 ```
 
+```js
+// helper to make partial application less verbose
+
+// less typing
+var read = adapt.part(fs.readFile)
+  , promise = read('data.txt', 'utf8')
+
+// more typing
+var read = adapt.bind(null, fs.readFile)
+  , promise = read('data.txt', 'utf8')
+```
+
 # API
 
 ## Call a bare function
@@ -37,7 +49,7 @@ var adapt = require('ugly-adapter')
 
 ```js
 var adapt = require('ugly-adapter')
-  , fn = adapt.partial(someFunction, ...someArgs)
+  , fn = adapt.part(someFunction, ...someArgs)
   , promise = fn(...someMoreArgs)
 ```
 
@@ -45,7 +57,7 @@ var adapt = require('ugly-adapter')
 
 ```js
 var adapt = require('ugly-adapter')
-  , fn = adapt.method.partial(object, methodName, ...someArgs)
+  , fn = adapt.method.part(object, methodName, ...someArgs)
   , promise = fn(...someMoreArgs)
 ```
 
@@ -53,9 +65,9 @@ Note about partial application. You can basically just move the `)(` around will
 
 ```js
 // these behave identically
-var promise = adapt.partial(a, b)()
-var promise = adapt.partial(a)(b)
-var promise = adapt.partial()(a, b)
+var promise = adapt.part(a, b)()
+var promise = adapt.part(a)(b)
+var promise = adapt.part()(a, b)
 ```
 
 ## FAQ
