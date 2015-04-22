@@ -16,8 +16,9 @@ function say(mess, cb){
   })
 }
 
-function getSelf(cb){
+function getSelf(){
   var self = this
+  var cb = [].slice.call(arguments).pop()
   setImmediate(function(){
     cb(null, self)
   })
@@ -37,6 +38,7 @@ function arrayify(){
   })
 }
 
+var arrayifyLib = { arrayify: arrayify }
 
 describe('test helpers', function(){
 
@@ -233,29 +235,15 @@ describe(pkg.name, function(){
     it('should partially apply', function(done){
 
       co(function*(){
-        var applied = adapt.part(say, 'hi')
-        var m = yield applied()
-        assert.equal(m, 'hi')
-        done()
-      }).catch(done)
-    })
-
-    it('should partially apply just one arg', function(done){
-
-      co(function*(){
-        var applied = adapt.part(say)
-        var m = yield applied('hi')
-        assert.equal(m, 'hi')
-        done()
-      }).catch(done)
-    })
-
-    it('should partially apply no args', function(done){
-
-      co(function*(){
-        var applied = adapt.part()
-        var m = yield applied(say, 'hi')
-        assert.equal(m, 'hi')
+        assert.deepEqual(yield adapt.part(arrayify,0,1,2,3,4,5,6)(),[0,1,2,3,4,5,6])
+        assert.deepEqual(yield adapt.part(arrayify,0,1,2,3,4,5)(6),[0,1,2,3,4,5,6])
+        assert.deepEqual(yield adapt.part(arrayify,0,1,2,3,4)(5,6),[0,1,2,3,4,5,6])
+        assert.deepEqual(yield adapt.part(arrayify,0,1,2,3)(4,5,6),[0,1,2,3,4,5,6])
+        assert.deepEqual(yield adapt.part(arrayify,0,1,2)(3,4,5,6),[0,1,2,3,4,5,6])
+        assert.deepEqual(yield adapt.part(arrayify,0,1)(2,3,4,5,6),[0,1,2,3,4,5,6])
+        assert.deepEqual(yield adapt.part(arrayify,0)(1,2,3,4,5,6),[0,1,2,3,4,5,6])
+        assert.deepEqual(yield adapt.part(arrayify)(0,1,2,3,4,5,6),[0,1,2,3,4,5,6])
+        assert.deepEqual(yield adapt.part()(arrayify,0,1,2,3,4,5,6),[0,1,2,3,4,5,6])
         done()
       }).catch(done)
     })
@@ -268,6 +256,17 @@ describe(pkg.name, function(){
       }).catch(function(){
         done()
       })
+    })
+
+    it('partial application should pass undefined context (in strict mode)', function(done){
+
+      co(function*(){
+        assert.strictEqual(yield adapt.part(getSelf)(), undefined)
+        assert.strictEqual(yield adapt.part()(getSelf), undefined)
+        assert.strictEqual(yield adapt.part(getSelf,1,2,3,4,5,6,7,8,9)(), undefined)
+        assert.strictEqual(yield adapt.part()(getSelf,1,2,3,4,5,6,7,8,9), undefined)
+        done()
+      }).catch(done)
     })
   })
 
@@ -374,43 +373,19 @@ describe(pkg.name, function(){
     it('should partially apply', function(done){
 
       co(function*(){
-        var fakeLib = { say: say }
-        var applied = adapt.method.part(fakeLib, 'say', 'hi')
-        var m = yield applied()
-        assert.equal(m, 'hi')
-        done()
-      }).catch(done)
-    })
-
-    it('should partially apply just two args', function(done){
-
-      co(function*(){
-        var fakeLib = { say: say }
-        var applied = adapt.method.part(fakeLib, 'say')
-        var m = yield applied('hi')
-        assert.equal(m, 'hi')
-        done()
-      }).catch(done)
-    })
-
-    it('should partially apply just one arg', function(done){
-
-      co(function*(){
-        var fakeLib = { say: say }
-        var applied = adapt.method.part(fakeLib)
-        var m = yield applied('say', 'hi')
-        assert.equal(m, 'hi')
-        done()
-      }).catch(done)
-    })
-
-    it('should partially apply no args', function(done){
-
-      co(function*(){
-        var fakeLib = { say: say }
-        var applied = adapt.method.part()
-        var m = yield applied(fakeLib, 'say', 'hi')
-        assert.equal(m, 'hi')
+        assert.deepEqual(yield adapt.method.part(arrayifyLib,'arrayify',1,2,3,4,5,6,7,8,9,10)(), [1,2,3,4,5,6,7,8,9,10])
+        assert.deepEqual(yield adapt.method.part(arrayifyLib,'arrayify',1,2,3,4,5,6,7,8,9)(10), [1,2,3,4,5,6,7,8,9,10])
+        assert.deepEqual(yield adapt.method.part(arrayifyLib,'arrayify',1,2,3,4,5,6,7,8)(9,10), [1,2,3,4,5,6,7,8,9,10])
+        assert.deepEqual(yield adapt.method.part(arrayifyLib,'arrayify',1,2,3,4,5,6,7)(8,9,10), [1,2,3,4,5,6,7,8,9,10])
+        assert.deepEqual(yield adapt.method.part(arrayifyLib,'arrayify',1,2,3,4,5,6)(7,8,9,10), [1,2,3,4,5,6,7,8,9,10])
+        assert.deepEqual(yield adapt.method.part(arrayifyLib,'arrayify',1,2,3,4,5)(6,7,8,9,10), [1,2,3,4,5,6,7,8,9,10])
+        assert.deepEqual(yield adapt.method.part(arrayifyLib,'arrayify',1,2,3,4)(5,6,7,8,9,10), [1,2,3,4,5,6,7,8,9,10])
+        assert.deepEqual(yield adapt.method.part(arrayifyLib,'arrayify',1,2,3)(4,5,6,7,8,9,10), [1,2,3,4,5,6,7,8,9,10])
+        assert.deepEqual(yield adapt.method.part(arrayifyLib,'arrayify',1,2)(3,4,5,6,7,8,9,10), [1,2,3,4,5,6,7,8,9,10])
+        assert.deepEqual(yield adapt.method.part(arrayifyLib,'arrayify',1)(2,3,4,5,6,7,8,9,10), [1,2,3,4,5,6,7,8,9,10])
+        assert.deepEqual(yield adapt.method.part(arrayifyLib,'arrayify')(1,2,3,4,5,6,7,8,9,10), [1,2,3,4,5,6,7,8,9,10])
+        assert.deepEqual(yield adapt.method.part(arrayifyLib)('arrayify',1,2,3,4,5,6,7,8,9,10), [1,2,3,4,5,6,7,8,9,10])
+        assert.deepEqual(yield adapt.method.part()(arrayifyLib,'arrayify',1,2,3,4,5,6,7,8,9,10), [1,2,3,4,5,6,7,8,9,10])
         done()
       }).catch(done)
     })
@@ -424,6 +399,19 @@ describe(pkg.name, function(){
       }).catch(function(){
         done()
       })
+    })
+
+    it('partial application should pass context', function(done){
+
+      co(function*(){
+        var fakeLib = { getSelf: getSelf }
+        assert.strictEqual(yield adapt.method.part(fakeLib, 'getSelf')(), fakeLib)
+        assert.strictEqual(yield adapt.method.part(fakeLib)('getSelf'), fakeLib)
+        assert.strictEqual(yield adapt.method.part()(fakeLib, 'getSelf'), fakeLib)
+        assert.strictEqual(yield adapt.method.part()(fakeLib, 'getSelf',1,2,3,4,5,6,7,8), fakeLib)
+        assert.strictEqual(yield adapt.method.part(fakeLib, 'getSelf',1,2,3,4,5,6,7,8)(), fakeLib)
+        done()
+      }).catch(done)
     })
   })
 })
