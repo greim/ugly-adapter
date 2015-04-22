@@ -19,43 +19,43 @@ var adapt = require('ugly-adapter')
 
 # API
 
-## Call a bare function, return a promise.
+## Call a bare function
 
 ```js
 var adapt = require('ugly-adapter')
   , promise = adapt(someFunction, ...args)
 ```
 
-## Call a method on an object, return a promise
+## Call a method on an object
 
 ```js
 var adapt = require('ugly-adapter')
   , promise = adapt.method(object, methodName, ...args)
 ```
 
-## Partially apply a bare function, return a function that returns a promise.
+## Partially apply a bare function
 
 ```js
 var adapt = require('ugly-adapter')
-  , fn = adapt.curry(someFunction, ...someArgs)
+  , fn = adapt.partial(someFunction, ...someArgs)
   , promise = fn(...someMoreArgs)
 ```
 
-## Partially apply a method on an object, return a function that returns a promise
+## Partially apply a method on an object
 
 ```js
 var adapt = require('ugly-adapter')
-  , fn = adapt.method.curry(object, methodName, ...someArgs)
+  , fn = adapt.method.partial(object, methodName, ...someArgs)
   , promise = fn(...someMoreArgs)
 ```
 
-Note about currying. You can basically just move the `)(` around willy-nilly.
+Note about partial application. You can basically just move the `)(` around willy-nilly.
 
 ```js
-// these each behave identically
-var promise = adapt.curry(a, b)()
-var promise = adapt.curry(a)(b)
-var promise = adapt.curry()(a, b)
+// these behave identically
+var promise = adapt.partial(a, b)()
+var promise = adapt.partial(a)(b)
+var promise = adapt.partial()(a, b)
 ```
 
 ## FAQ

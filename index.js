@@ -72,18 +72,18 @@ function functionPromify(fn, arg0, arg1){
   }
 }
 
-function currier() {
-  var curriedArgs = slice.call(arguments)
+function partialApplier() {
+  var appliedArgs = slice.call(arguments)
     , fn = this
   return function(){
     var remainingArgs = slice.call(arguments)
-      , args = curriedArgs.concat(remainingArgs)
+      , args = appliedArgs.concat(remainingArgs)
     return fn.apply(null, args)
   }
 }
 
-methodPromify.curry = currier.bind(methodPromify)
-functionPromify.curry = currier.bind(functionPromify)
+methodPromify.partial = partialApplier.bind(methodPromify)
+functionPromify.partial = partialApplier.bind(functionPromify)
 
 module.exports = functionPromify
 module.exports.method = methodPromify

@@ -230,40 +230,40 @@ describe(pkg.name, function(){
       })
     })
 
-    it('should curry', function(done){
+    it('should partially apply', function(done){
 
       co(function*(){
-        var curried = adapt.curry(say, 'hi')
-        var m = yield curried()
+        var applied = adapt.partial(say, 'hi')
+        var m = yield applied()
         assert.equal(m, 'hi')
         done()
       }).catch(done)
     })
 
-    it('should curry just one arg', function(done){
+    it('should partially apply just one arg', function(done){
 
       co(function*(){
-        var curried = adapt.curry(say)
-        var m = yield curried('hi')
+        var applied = adapt.partial(say)
+        var m = yield applied('hi')
         assert.equal(m, 'hi')
         done()
       }).catch(done)
     })
 
-    it('should curry no args', function(done){
+    it('should partially apply no args', function(done){
 
       co(function*(){
-        var curried = adapt.curry()
-        var m = yield curried(say, 'hi')
+        var applied = adapt.partial()
+        var m = yield applied(say, 'hi')
         assert.equal(m, 'hi')
         done()
       }).catch(done)
     })
 
-    it('curry should error', function(done){
+    it('partial application should error', function(done){
 
       co(function*(){
-        yield adapt.curry()(fail)
+        yield adapt.partial()(fail)
         done(new Error('failed to fail'))
       }).catch(function(){
         done()
@@ -371,55 +371,55 @@ describe(pkg.name, function(){
       })
     })
 
-    it('should curry', function(done){
+    it('should partially apply', function(done){
 
       co(function*(){
         var fakeLib = { say: say }
-        var curried = adapt.method.curry(fakeLib, 'say', 'hi')
-        var m = yield curried()
+        var applied = adapt.method.partial(fakeLib, 'say', 'hi')
+        var m = yield applied()
         assert.equal(m, 'hi')
         done()
       }).catch(done)
     })
 
-    it('should curry just two args', function(done){
+    it('should partially apply just two args', function(done){
 
       co(function*(){
         var fakeLib = { say: say }
-        var curried = adapt.method.curry(fakeLib, 'say')
-        var m = yield curried('hi')
+        var applied = adapt.method.partial(fakeLib, 'say')
+        var m = yield applied('hi')
         assert.equal(m, 'hi')
         done()
       }).catch(done)
     })
 
-    it('should curry just one arg', function(done){
+    it('should partially apply just one arg', function(done){
 
       co(function*(){
         var fakeLib = { say: say }
-        var curried = adapt.method.curry(fakeLib)
-        var m = yield curried('say', 'hi')
+        var applied = adapt.method.partial(fakeLib)
+        var m = yield applied('say', 'hi')
         assert.equal(m, 'hi')
         done()
       }).catch(done)
     })
 
-    it('should curry no args', function(done){
+    it('should partially apply no args', function(done){
 
       co(function*(){
         var fakeLib = { say: say }
-        var curried = adapt.method.curry()
-        var m = yield curried(fakeLib, 'say', 'hi')
+        var applied = adapt.method.partial()
+        var m = yield applied(fakeLib, 'say', 'hi')
         assert.equal(m, 'hi')
         done()
       }).catch(done)
     })
 
-    it('curry should error', function(done){
+    it('partial application should error', function(done){
 
       co(function*(){
         var fakeLib = { fail: fail }
-        yield adapt.curry()(fakeLib, 'fail')
+        yield adapt.partial()(fakeLib, 'fail')
         done(new Error('failed to fail'))
       }).catch(function(){
         done()
