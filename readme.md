@@ -56,6 +56,7 @@ Note about currying. You can basically just move the `)(` around willy-nilly.
 var promise = adapt.curry(a, b)()
 var promise = adapt.curry(a)(b)
 var promise = adapt.curry()(a, b)
+```
 
 ## FAQ
 
