@@ -1,8 +1,9 @@
-# Straightforward way to obtain promises from your standard error-first callback APIs
+# Straightforward way to obtain promises from your standard error-first callback functions
 
-Large swaths of the npm ecosystem--plus node.js and io.js--have async APIs that accept callbacks.
+Large swaths of the npm ecosystem—plus node.js and io.js—have async APIs that accept callbacks.
 Many people wish these APIs produced promises instead.
-Whether or not that wish is someday realized, this lib meanwhile provides an easy way to obtain promises from error-first callback-driven APIs.
+Whether or not that wish is someday fulfilled, this lib provides an easy way to obtain promises from error-first callback-driven APIs.
+No heavy infrastructure here, just a simple adapter.
 
 ## Install
 
