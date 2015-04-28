@@ -1,9 +1,8 @@
 # Straightforward way to obtain promises from your standard error-first callback functions
 
-Large swaths of the npm ecosystem—plus node.js and io.js—have async APIs that accept callbacks.
-Many people wish these APIs produced promises instead.
-Whether or not that wish is someday fulfilled, this lib provides an easy way to obtain promises from error-first callback-driven APIs.
-No heavy infrastructure here, just a simple adapter.
+Large swaths of the node/io.js ecosystem use callbacks.
+Many people wish they used promises instead.
+Whether or not that wish is someday fulfilled, this lib provides an easy way to get promises from callback APIs.
 
 ## Install
 
@@ -46,7 +45,7 @@ var adapt = require('ugly-adapter')
 ```js
 var adapt = require('ugly-adapter')
   , fn = adapt.part(someFunction, ...someArgs)
-  , promise = fn(...someMoreArgs)
+  , promise = fn(...moreArgs)
 ```
 
 ## Partially apply a method on an object
@@ -54,7 +53,7 @@ var adapt = require('ugly-adapter')
 ```js
 var adapt = require('ugly-adapter')
   , fn = adapt.method.part(object, methodName, ...someArgs)
-  , promise = fn(...someMoreArgs)
+  , promise = fn(...moreArgs)
 ```
 
 Note about partial application. You can basically just move the `)(` around willy-nilly.
@@ -65,10 +64,3 @@ var promise = adapt.part(a, b)()
 var promise = adapt.part(a)(b)
 var promise = adapt.part()(a, b)
 ```
-
-## FAQ
-
- 1. **Aren't promises slow?** To satisfy the promises-are-slow-you-should-use-bluebird crowd, this lib will create and return [native-or-bluebird](https://www.npmjs.com/package/native-or-bluebird) promises. Either way, the API is identical. Note that this lib doesn't actually pull in or depend on Bluebird in any way. You must depend on it in your own `package.json`. There's a benchmark in this project which sucks and should be improved, but which you can run if you want.
- 2. **Doesn't Lib X already do this?** Yes, and lots of other stuff besides. This lib is very minimal. If you're already using Lib X, you should probably keep using it and ignore this. If, however, you're using a generator trampoline like [co](https://www.npmjs.com/package/co) and all you want are *yieldables*, maybe this is the ticket.
- 3. **Is es6 required?** Sort of. Bluebird (see above) or a global `Promise` constructor (which is part of es6) is required. If neither are found this lib will only bring cataclysm and death.
- 
