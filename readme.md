@@ -35,6 +35,11 @@ var adapt = require('ugly-adapter')
 adapt(fs.readFile, './data.txt', 'utf8').then(function(data) {
   // ...
 })
+
+// same thing but using a callback (for comparison purposes)
+fs.readFile('./data.txt', 'utf8', function(err, data) {
+  // ...
+})
 ```
 
 ## Call a method on an object
@@ -46,7 +51,19 @@ var adapt = require('ugly-adapter')
 
 // example
 var user = new User()
-adapt.method(user, 'authenticate').then(function(isAuthenticated) {
+adapt.method(user, 'authenticate', {
+  userName: userName,
+  password: password
+}).then(function() {
+  // ...
+})
+
+// same thing but using a callback (for comparison purposes)
+var user = new User()
+user.authenticate({
+  userName: userName,
+  password: password
+}, function(err) {
   // ...
 })
 ```
@@ -75,7 +92,10 @@ var adapt = require('ugly-adapter')
 // example
 var user = new User()
 var authenticate = adapt.method.part(user, 'authenticate')
-authenticate().then(function(isAuthenticated) {
+authenticate({
+  userName: userName,
+  password: password
+}).then(function() {
   // ...
 })
 ```
