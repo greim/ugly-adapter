@@ -30,6 +30,11 @@ var read = adapt.part(fs.readFile)
 ```js
 var adapt = require('ugly-adapter')
   , promise = adapt(someFunction, ...args)
+
+// example
+adapt(fs.readFile, './data.txt', 'utf8').then(function(data) {
+  // ...
+})
 ```
 
 ## Call a method on an object
@@ -38,6 +43,12 @@ var adapt = require('ugly-adapter')
 // method sees proper 'this'
 var adapt = require('ugly-adapter')
   , promise = adapt.method(object, methodName, ...args)
+
+// example
+var user = new User()
+adapt.method(user, 'authenticate').then(function(isAuthenticated) {
+  // ...
+})
 ```
 
 ## Partially apply a bare function
@@ -46,6 +57,12 @@ var adapt = require('ugly-adapter')
 var adapt = require('ugly-adapter')
   , fn = adapt.part(someFunction, ...someArgs)
   , promise = fn(...moreArgs)
+
+// example
+var readData = adapt.part(fs.readFile, './data.txt', 'utf8')
+readData().then(function(data) {
+  // ...
+})
 ```
 
 ## Partially apply a method on an object
@@ -54,6 +71,13 @@ var adapt = require('ugly-adapter')
 var adapt = require('ugly-adapter')
   , fn = adapt.method.part(object, methodName, ...someArgs)
   , promise = fn(...moreArgs)
+
+// example
+var user = new User()
+var authenticate = adapt.method.part(user, 'authenticate')
+authenticate().then(function(isAuthenticated) {
+  // ...
+})
 ```
 
 Note about partial application. You can basically just move the `)(` around willy-nilly.
