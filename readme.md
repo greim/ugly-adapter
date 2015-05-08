@@ -12,7 +12,7 @@ npm install ugly-adapter
 
 ## Use
 
-As mentioned, this library produces plain old [ES6 promise objects](http://www.html5rocks.com/en/tutorials/es6/promises/).
+This library produces plain old [ES6 promise objects](http://www.html5rocks.com/en/tutorials/es6/promises/).
 It doesn't provide a promise implementation, rather just uses the in-built native one provided by JavaScript.
 As a recap, when using promises, use the `then()` method to handle the results.
 Use the `catch()` method to handle errors.
