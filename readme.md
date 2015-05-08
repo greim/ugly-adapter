@@ -1,7 +1,7 @@
 # Straightforward way to obtain promises from your standard error-first callback functions
 
-Large swaths of the node/io.js ecosystem use callbacks.
-Many people wish they used promises instead.
+Large swaths of the node/io.js ecosystem use callbacks for asynchronous flow.
+Many people wish these methods returned promises instead or in addition to accepting callbacks.
 Whether or not that wish is someday fulfilled, this lib provides an easy way to get promises from callback APIs.
 
 ## Install
@@ -12,15 +12,34 @@ npm install ugly-adapter
 
 ## Use
 
-```js
-var adapt = require('ugly-adapter')
-  , promise = adapt(fs.readFile, './data.txt', 'utf8')
-```
+As mentioned, this library produces plain old ES6 promise objects.
+Use the `then()` method to handle the results.
+Use the `catch()` method to handle errors.
 
 ```js
-// helper for partial application
+var adapt = require('ugly-adapter')
+
+adapt(fs.readFile, './data.txt', 'utf8')
+.then(function(data) {
+  // now you have data!
+})
+.catch(function(err) {
+  // oops, there was an error :(
+})
+```
+
+This lib also exposes `part()` methods, which provide a convenient way to do [partial application](http://ejohn.org/blog/partial-functions-in-javascript/).
+
+```js
 var read = adapt.part(fs.readFile)
-  , promise = read('./data.txt', 'utf8')
+
+read('./data.txt', 'utf8')
+.then(function(data) {
+  // now you have data!
+})
+.catch(function(err) {
+  // oops, there was an error :(
+})
 ```
 
 # API
