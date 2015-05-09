@@ -12,11 +12,8 @@ npm install ugly-adapter
 
 ## Use
 
-This library produces plain old [ES6 promise objects](http://www.html5rocks.com/en/tutorials/es6/promises/).
-It doesn't provide a promise implementation, rather just uses the in-built native one provided by JavaScript.
-As a recap, when using promises, use the `then()` method to handle the results.
-Use the `catch()` method to handle errors.
-These methods can be chained together to better express your execution flow.
+This library adapts any error-first callback signature to produce plain old [ES6 promises](http://www.2ality.com/2014/10/es6-promises-api.html).
+Its promise implementation is just the standard one provided JavaScript.
 
 ```js
 var adapt = require('ugly-adapter')
@@ -31,17 +28,12 @@ adapt(fs.readFile, './data.txt', 'utf8')
 ```
 
 This lib also exposes `part()` methods, which provide a convenient way to do [partial application](http://ejohn.org/blog/partial-functions-in-javascript/).
+This is useful if you want to re-use an adapted version of a function.
 
 ```js
-var read = adapt.part(fs.readFile)
-
-read('./data.txt', 'utf8')
-.then(function(data) {
-  // now you have data!
-})
-.catch(function(err) {
-  // oops, there was an error :(
-})
+get = adapt.part(require('http').get)
+get('http://localhost/foo').then(...)
+get('http://localhost/bar').then(...)
 ```
 
 # API
