@@ -12,8 +12,8 @@ npm install ugly-adapter
 
 ## Use
 
-This library adapts any error-first callback signature to produce plain old [ES6 promises](http://www.2ality.com/2014/10/es6-promises-api.html).
-Its promise implementation is just the standard one provided JavaScript.
+This library adapts any function that accepts an error-first callback to produce plain old [ES6 promises](http://www.2ality.com/2014/10/es6-promises-api.html) instead.
+Its uses JavaScript's native promise implementation.
 
 ```js
 var adapt = require('ugly-adapter')
