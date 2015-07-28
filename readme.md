@@ -1,8 +1,9 @@
-# Straightforward way to obtain promises from your standard error-first callback functions
+# Adapt callback APIs to produce ES6 promises
 
-Large swaths of the node/io.js ecosystem use callbacks for asynchronous flow.
-Many people wish these methods returned promises instead or in addition to accepting callbacks.
-Whether or not that wish is someday fulfilled, this lib provides an easy way to get promises from callback APIs.
+Core node.js libraries, plus large swaths of the npm ecosystem, use error-first callbacks for asynchronous control flow.
+A movement is afoot to make everything return promises, but it will be a slow transition.
+For now, this lib converts callback-accepting functions/methods into promise-returning ones.
+It's like that ugly adapter thingy you buy, intending to throw away, but you need to plug your old device into your new device.
 
 ## Install
 
@@ -12,37 +13,35 @@ npm install ugly-adapter
 
 ## Use
 
-This library adapts any function that accepts an error-first callback to produce plain old [ES6 promises](http://www.2ality.com/2014/10/es6-promises-api.html) instead.
-Its uses JavaScript's native promise implementation.
+This library adapts any function that accepts an error-first callback to produce ES6 promises.
 
 ```js
 var adapt = require('ugly-adapter')
 
-adapt(fs.readFile, './data.txt', 'utf8')
-.then(function(data) {
+adapt(fs.readFile, './data.txt', 'utf8').then(function(data) {
   // now you have data!
-})
-.catch(function(err) {
+}).catch(function(err) {
   // oops, there was an error :(
-})
+});
 ```
 
-This lib also exposes `part()` methods, which provide a convenient way to do [partial application](http://ejohn.org/blog/partial-functions-in-javascript/).
-This is useful if you want to re-use an adapted version of a function.
+This lib also exposes methods to make partial application easier.
+Partial application is useful if you want to re-use an adapted version of a function.
 
 ```js
-get = adapt.part(require('http').get)
-get('http://localhost/foo').then(...)
-get('http://localhost/bar').then(...)
+read = adapt.part(require('fs').readFile)
+read('./data1', 'utf8').then(...)
+read('./data2', 'utf8').then(...)
 ```
 
 # API
 
 ## Call a bare function
 
+Useful when you don't think a function cares about `this`.
+
 ```js
-var adapt = require('ugly-adapter')
-  , promise = adapt(someFunction, ...args)
+var promise = adapt(someFunction, ...args)
 
 // example
 adapt(fs.readFile, './data.txt', 'utf8').then(function(data) {
@@ -57,10 +56,10 @@ fs.readFile('./data.txt', 'utf8', function(err, data) {
 
 ## Call a method on an object
 
+Useful when you DO think a function cares about `this`.
+
 ```js
-// method sees proper 'this'
-var adapt = require('ugly-adapter')
-  , promise = adapt.method(object, methodName, ...args)
+var promise = adapt.method(object, methodName, ...args)
 
 // example
 var user = new User()
@@ -84,13 +83,12 @@ user.authenticate({
 ## Partially apply a bare function
 
 ```js
-var adapt = require('ugly-adapter')
-  , fn = adapt.part(someFunction, ...someArgs)
+var fn = adapt.part(someFunction, ...someArgs)
   , promise = fn(...moreArgs)
 
 // example
-var readData = adapt.part(fs.readFile, './data.txt', 'utf8')
-readData().then(function(data) {
+var statData = adapt.part(fs.stat, './data.txt', 'utf8')
+statData().then(function(stat) {
   // ...
 })
 ```
@@ -113,7 +111,8 @@ authenticate({
 })
 ```
 
-Note about partial application. You can basically just move the `)(` around willy-nilly.
+A note about partial application.
+You can basically just move the `)(` around willy-nilly.
 
 ```js
 // these behave identically
