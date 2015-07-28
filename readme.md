@@ -1,4 +1,4 @@
-# Adapt callback APIs to produce ES6 promises
+# Simple Callback => Promise Helper
 
 Core node.js libraries, plus large swaths of the npm ecosystem, use error-first callbacks for asynchronous control flow.
 A movement is afoot to make everything return promises, but it will be a slow transition.
