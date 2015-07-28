@@ -1,9 +1,7 @@
 # Simple Callback => Promise Helper
 
-Core node.js libraries, plus large swaths of the npm ecosystem, use error-first callbacks for asynchronous control flow.
-A movement is afoot to make everything return promises, but it will be a slow transition.
-For now, this lib converts callback-accepting functions/methods into promise-returning ones.
-It's like that ugly adapter thingy you buy, intending to throw away, but you need to plug your old device into your new device.
+Promises are your shiny new smartphone, but you're trying to plug it into the Soviet-era Dell laptop of callbacks.
+So you go to the store and buy an adapter, intending to throw it away soon, but for now you need it and it will live in your backpack for like three years and get all caked with dirt but keep working.
 
 ## Install
 
