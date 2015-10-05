@@ -19,7 +19,9 @@
     "es6",
     "yield",
     "thenable",
-    "yieldable"
+    "yieldable",
+    "async",
+    "await"
   ],
   "author": "gregreimer@gmail.com",
   "license": "MIT",

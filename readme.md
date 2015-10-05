@@ -1,7 +1,8 @@
-# Simple Callback => Promise Helper
+# Simple Callback => Promise Adapter
 
-Promises are your shiny new smartphone, but you're trying to plug it into the Soviet-era Dell laptop of callbacks.
-So you go to the store and buy an adapter, intending to throw it away soon, but for now you need it and it will live in your backpack for like three years and get all caked with dirt but keep working.
+With [ES7 async functions](https://jakearchibald.com/2014/es7-async-functions/) gaining attention, the JavaScript world is poised to transition to promises.
+Unfortunately the error-first callback pattern is still mainstream, so for the foreseeable future we'll need a way to bridge the gap.
+This library accomplishes that in a straightforward, non-magical, easy-to-use way.
 
 ## Install
 
@@ -11,25 +12,20 @@ npm install ugly-adapter
 
 ## Use
 
-This library adapts any function that accepts an error-first callback to produce ES6 promises.
-
 ```js
-var adapt = require('ugly-adapter')
-
-adapt(fs.readFile, './data.txt', 'utf8').then(function(data) {
-  // now you have data!
-}).catch(function(err) {
-  // oops, there was an error :(
+import adapt from 'ugly-adapter';
+adapt(fs.readFile, './data.txt', 'utf8').then(data => {
+  // do something with `data`
 });
 ```
 
 This lib also exposes methods to make partial application easier.
-Partial application is useful if you want to re-use an adapted version of a function.
+Which is useful if you want to re-use an adapted version of a function.
 
 ```js
-read = adapt.part(require('fs').readFile)
-read('./data1', 'utf8').then(...)
-read('./data2', 'utf8').then(...)
+var read = adapt.part(fs.readFile);
+await read('./data1', 'utf8').then(...);
+await read('./data2', 'utf8').then(...);
 ```
 
 # API
@@ -39,64 +35,45 @@ read('./data2', 'utf8').then(...)
 Useful when you don't think a function cares about `this`.
 
 ```js
-var promise = adapt(someFunction, ...args)
+// signature
+var promise = adapt(<function>, ...args)
 
 // example
-adapt(fs.readFile, './data.txt', 'utf8').then(function(data) {
-  // ...
-})
-
-// same thing but using a callback (for comparison purposes)
-fs.readFile('./data.txt', 'utf8', function(err, data) {
-  // ...
-})
+adapt(fs.readFile, './data.txt', 'utf8').then(...)
 ```
 
 ## Call a method on an object
 
-Useful when you DO think a function cares about `this`.
+Useful when you think a function definitely cares about `this`.
 
 ```js
-var promise = adapt.method(object, methodName, ...args)
+// signature
+var promise = adapt.method(<object>, <string>, ...args)
 
 // example
 var user = new User()
 adapt.method(user, 'authenticate', {
   userName: userName,
   password: password
-}).then(function() {
-  // ...
-})
-
-// same thing but using a callback (for comparison purposes)
-var user = new User()
-user.authenticate({
-  userName: userName,
-  password: password
-}, function(err) {
-  // ...
-})
+}).then(...)
 ```
 
 ## Partially apply a bare function
 
 ```js
-var fn = adapt.part(someFunction, ...someArgs)
-  , promise = fn(...moreArgs)
+// signature
+var fn = adapt.part(<function>, ...args)
 
 // example
-var statData = adapt.part(fs.stat, './data.txt', 'utf8')
-statData().then(function(stat) {
-  // ...
-})
+var stat = adapt.part(fs.stat, './data.txt', 'utf8')
+stat().then(...)
 ```
 
 ## Partially apply a method on an object
 
 ```js
-var adapt = require('ugly-adapter')
-  , fn = adapt.method.part(object, methodName, ...someArgs)
-  , promise = fn(...moreArgs)
+// signature
+var fn = adapt.method.part(<object>, <string>, ...args)
 
 // example
 var user = new User()
@@ -104,17 +81,26 @@ var authenticate = adapt.method.part(user, 'authenticate')
 authenticate({
   userName: userName,
   password: password
-}).then(function() {
-  // ...
-})
+}).then(...)
 ```
 
 A note about partial application.
-You can basically just move the `)(` around willy-nilly.
+You can basically move the `)(` around willy-nilly.
 
 ```js
 // these behave identically
-var promise = adapt.part(a, b)()
-var promise = adapt.part(a)(b)
-var promise = adapt.part()(a, b)
+var promise = adapt.part(a,b,c)()
+var promise = adapt.part(a,b)(c)
+var promise = adapt.part(a)(b,c)
+var promise = adapt.part()(a,b,c)
+```
+
+# ES7 Async/Await Example
+
+```js
+async function jsonReadFile(path, encoding) {
+  let data = await adapt(fs.readFile, encoding);
+  data = JSON.parse(data);
+  return data;
+}
 ```
