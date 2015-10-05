@@ -38,7 +38,7 @@ Useful when you don't think a function cares about `this`.
 // signature
 var promise = adapt(<function>, ...args)
 
-// fs.readFile() example
+// fs.readFile(path, enc, callback) example
 adapt(fs.readFile, './data.txt', 'utf8').then(...)
 ```
 
@@ -50,7 +50,7 @@ Useful when you think a function definitely cares about `this`.
 // signature
 var promise = adapt.method(<object>, <string>, ...args)
 
-// user.authenticate() example
+// user.authenticate(opts, callback) example
 var user = new User()
 adapt.method(user, 'authenticate', {
   userName: userName,
