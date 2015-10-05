@@ -97,6 +97,8 @@ var promise = adapt.part()(a,b,c)
 
 # ES7 Async/Await Example
 
+Now that we can convert callbacks to promises, we can write async functions everywhere.
+
 ```js
 async function jsonReadFile(path, encoding) {
   let data = await adapt(fs.readFile, encoding);
