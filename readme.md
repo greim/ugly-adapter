@@ -30,7 +30,7 @@ await read('./data2', 'utf8').then(...);
 
 # API
 
-## Call a bare function
+## Call a bare function: `adapt()`
 
 Useful when you don't think a function cares about `this`.
 
@@ -38,11 +38,11 @@ Useful when you don't think a function cares about `this`.
 // signature
 var promise = adapt(<function>, ...args)
 
-// example
+// fs.readFile() example
 adapt(fs.readFile, './data.txt', 'utf8').then(...)
 ```
 
-## Call a method on an object
+## Call a method on an object: `adapt.method()`
 
 Useful when you think a function definitely cares about `this`.
 
@@ -50,7 +50,7 @@ Useful when you think a function definitely cares about `this`.
 // signature
 var promise = adapt.method(<object>, <string>, ...args)
 
-// example
+// user.authenticate() example
 var user = new User()
 adapt.method(user, 'authenticate', {
   userName: userName,
@@ -58,7 +58,7 @@ adapt.method(user, 'authenticate', {
 }).then(...)
 ```
 
-## Partially apply a bare function
+## Partially apply a bare function: `adapt.part()`
 
 ```js
 // signature
@@ -69,7 +69,7 @@ var stat = adapt.part(fs.stat, './data.txt', 'utf8')
 stat().then(...)
 ```
 
-## Partially apply a method on an object
+## Partially apply a method on an object: `adapt.method.part()`
 
 ```js
 // signature
