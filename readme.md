@@ -99,7 +99,7 @@ var promise = adapt.part()(a,b,c)
 
 You can promisify entire library modules, such as `fs`.
 It will return an object with all the same properties and functions.
-The functions have the same signature, sans callback.
+The functions have the same signature—sans callback—and return promises.
 
 ```js
 var adapt = require('ugly-adapter')
