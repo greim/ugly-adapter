@@ -95,7 +95,34 @@ var promise = adapt.part(a)(b,c)
 var promise = adapt.part()(a,b,c)
 ```
 
-# ES7 Async/Await Example
+## Promify a library: `adapt.promify(lib)`
+
+You can promisify entire library modules, such as `fs`.
+It will return an object with all the same properties and functions.
+The functions have the same signature, sans callback.
+
+```js
+var adapt = require('ugly-adapter')
+  , callbackFs = require('fs')
+  , fs = adapt.promify(callbackFs);
+
+fs.stat(...).then(...);
+```
+
+If you don't want to promify the whole thing, you can declare a whitelist of items you want promified.
+If you don't declare any, it will just promify everything.
+
+```js
+var adapt = require('ugly-adapter')
+  , callbackFs = require('fs')
+  , fs = adapt.promify(callbackFs, 'stat', 'readFile');
+
+fs.stat(...).then(...);
+fs.readFile(...).then(...);
+fs.link(...).then(...); // error, wasn't in the list!
+```
+
+# Async/Await Example
 
 Now that we can convert callbacks to promises, we can write async functions everywhere.
 

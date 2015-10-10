@@ -3,12 +3,15 @@
  * MIT License. See mit-license.txt for more info.
  */
 
+/*eslint-env node, mocha */
+
 'use strict'
 
 var assert = require('assert')
   , co = require('co')
   , adapt = require('../index')
   , pkg = require('../package')
+  , fs = require('fs');
 
 function say(mess, cb){
   setImmediate(function(){
@@ -414,5 +417,41 @@ describe(pkg.name, function(){
       }).catch(done)
     })
   })
-})
+
+  describe('library promisification', function() {
+
+    it('should promisify all of fs', co.wrap(function*() {
+      var pfs = adapt.promify(fs);
+      var stat = yield pfs.stat(__dirname);
+      assert.ok(stat.isDirectory());
+      assert.strictEqual(typeof pfs.readdir, 'function');
+      assert.strictEqual(typeof pfs.readFile, 'function');
+    }));
+
+    it('should promisify named methods of fs', co.wrap(function*() {
+      var pfs = adapt.promify(fs, 'stat', 'readdir');
+      var stat = yield pfs.stat(__dirname);
+      assert.ok(stat.isDirectory());
+      assert.strictEqual(typeof pfs.readdir, 'function');
+      assert.strictEqual(typeof pfs.readFile, 'undefined');
+    }));
+
+    it('should promisify a fake lib', co.wrap(function*() {
+      var fakeLib = {
+        qux: function() {},
+      };
+      var pFakeLib = adapt.promify(fakeLib);
+      assert.strictEqual(typeof pFakeLib.qux, 'function');
+    }));
+
+    it('should carry over non-functions', co.wrap(function*() {
+      var fakeLib = {
+        foo: 'bar',
+        qux: function() {},
+      };
+      var pFakeLib = adapt.promify(fakeLib);
+      assert.strictEqual(pFakeLib.foo, 'bar');
+    }));
+  });
+});
 
