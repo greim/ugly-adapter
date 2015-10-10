@@ -109,8 +109,8 @@ var adapt = require('ugly-adapter')
 fs.stat(...).then(...);
 ```
 
-If you don't want to promify the whole thing, you can declare a whitelist of items you want promified.
-If you don't declare any, it will just promify everything.
+The above promifies the entire `fs` module.
+If you only want to promify some methods, declare a whitelist.
 
 ```js
 var adapt = require('ugly-adapter')
@@ -119,7 +119,7 @@ var adapt = require('ugly-adapter')
 
 fs.stat(...).then(...);
 fs.readFile(...).then(...);
-fs.link(...).then(...); // error, wasn't in the list!
+fs.link(...).then(...); // error, wasn't in the whitelist!
 ```
 
 # Async/Await Example
