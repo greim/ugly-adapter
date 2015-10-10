@@ -109,8 +109,8 @@ var adapt = require('ugly-adapter')
 fs.stat(...).then(...);
 ```
 
-The above promifies the entire `fs` module.
-If you only want to promify some methods, declare a whitelist.
+The above promifies every function in the `fs` module.
+If you only want to promify a subset of functions, declare them in a whitelist.
 
 ```js
 var adapt = require('ugly-adapter')
