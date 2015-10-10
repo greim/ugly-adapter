@@ -1,8 +1,8 @@
-# Simple Callback => Promise Adapter
+# Universal Callback => Promise Adapter
 
-With [ES7 async functions](https://jakearchibald.com/2014/es7-async-functions/) gaining attention, the JavaScript world is poised to transition to promises.
-Unfortunately the error-first callback pattern is still mainstream, so for the foreseeable future we'll need a way to bridge the gap.
-This library accomplishes that in a straightforward, non-magical, easy-to-use way.
+With [ES7 async functions](https://jakearchibald.com/2014/es7-async-functions/) gaining prominence, the JavaScript world is poised to transition to promises.
+That means we need a way to *promisify* callback-based APIs.
+Rather than importing lots of different promisification wrappers for each API, this lib provides a single way to promisify every API.
 
 ## Install
 
