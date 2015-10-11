@@ -11,7 +11,7 @@
   "description": "get promises out of standard callback APIs",
   "main": "index.js",
   "scripts": {
-    "test": "node node_modules/.bin/mocha --harmony"
+    "test": "mocha --compilers js:babel/register"
   },
   "keywords": [
     "promise",
@@ -35,8 +35,8 @@
     "native-or-bluebird": "^1.1.2"
   },
   "devDependencies": {
+    "babel": "^5.8.23",
     "bluebird": "^2.9.12",
-    "co": "^4.3.1",
     "mocha": "^2.1.0",
     "numeral": "^1.5.3"
   }

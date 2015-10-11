@@ -1,4 +1,5 @@
 {
+  "parser": "babel-eslint",
   "ecmaFeatures": {
     "arrowFunctions": true,
     "destructuring": true,
@@ -48,6 +49,7 @@
     "eol-last": 1,
     "no-process-exit": 0,
     "semi": 1,
-    "key-spacing": 0
+    "key-spacing": 0,
+    "no-var": 1
   }
 }

@@ -5,453 +5,364 @@
 
 /*eslint-env node, mocha */
 
-'use strict'
+import assert from 'assert';
+import adapt from '../index';
+import pkg from '../package';
+import fs from 'fs';
 
-var assert = require('assert')
-  , co = require('co')
-  , adapt = require('../index')
-  , pkg = require('../package')
-  , fs = require('fs');
-
-function say(mess, cb){
-  setImmediate(function(){
-    cb(null, mess)
-  })
+async function assertAsyncThrows(fn, message) {
+  try { await fn(); }
+  catch(ex) { return; }
+  throw new Error(message || 'missing expected exception');
 }
 
-function getSelf(){
-  var self = this
-  var cb = [].slice.call(arguments).pop()
-  setImmediate(function(){
-    cb(null, self)
-  })
+function say(mess, cb) {
+  setImmediate(() => {
+    cb(null, mess);
+  });
 }
 
-function fail(cb){
-  setImmediate(function(){
-    cb(new Error('oops'))
-  })
+function getSelf() {
+  const cb = [].slice.call(arguments).pop();
+  setImmediate(() => {
+    cb(null, this);
+  });
 }
 
-function arrayify(){
-  var args = [].slice.call(arguments)
-    , cb = args.pop()
-  setImmediate(function(){
-    cb(null, args)
-  })
+function fail(cb) {
+  setImmediate(() => {
+    cb(new Error('oops'));
+  });
 }
 
-var arrayifyLib = { arrayify: arrayify }
+function arrayify() {
+  const args = [].slice.call(arguments)
+    , cb = args.pop();
+  setImmediate(() => {
+    cb(null, args);
+  });
+}
 
-describe('test helpers', function(){
+const arrayifyLib = { arrayify };
 
-  it('should say()', function(done){
+describe('test helpers', () => {
 
-    say('hello', function(err, message){
+  it('should say()', done => {
+
+    say('hello', (err, message) => {
       if (err) {
-        done(err)
+        done(err);
+      } else {
+        assert.strictEqual(message, 'hello');
+        done();
       }
-      assert.strictEqual(message, 'hello')
-      done()
-    })
-  })
+    });
+  });
 
-  it('should getSelf()', function(done){
+  it('should getSelf()', done => {
 
-    var thisThing = {}
-    getSelf.call(thisThing, function(err, thatThing){
+    const thisThing = {};
+    getSelf.call(thisThing, (err, thatThing) => {
       if (err) {
-        done(err)
+        done(err);
+      } else {
+        assert.strictEqual(thisThing, thatThing);
+        done();
       }
-      assert.strictEqual(thisThing, thatThing)
-      done()
-    })
-  })
+    });
+  });
 
-  it('should fail()', function(done){
+  it('should fail()', done => {
 
-    fail(function(err){
-      assert.ok(err)
-      done()
-    })
-  })
+    fail(err => {
+      assert.ok(err);
+      done();
+    });
+  });
 
-  it('should arrayify() 0 args', function(done){
+  it('should arrayify() 0 args', done => {
 
-    arrayify(function(err, array){
+    arrayify((err, array) => {
       if (err) {
-        done(err)
+        done(err);
+      } else {
+        assert.deepEqual(array, []);
+        done();
       }
-      assert.deepEqual(array, [])
-      done()
-    })
-  })
+    });
+  });
 
-  it('should arrayify() 1 arg', function(done){
+  it('should arrayify() 1 arg', done => {
 
-    arrayify(1,function(err, array){
+    arrayify(1, (err, array) => {
       if (err) {
-        done(err)
+        done(err);
+      } else {
+        assert.deepEqual(array, [1]);
+        done();
       }
-      assert.deepEqual(array, [1])
-      done()
-    })
-  })
+    });
+  });
 
-  it('should arrayify() 2 args', function(done){
+  it('should arrayify() 2 args', done => {
 
-    arrayify(1,2,function(err, array){
+    arrayify(1, 2, (err, array) => {
       if (err) {
-        done(err)
+        done(err);
+      } else {
+        assert.deepEqual(array, [1,2]);
+        done();
       }
-      assert.deepEqual(array, [1,2])
-      done()
-    })
-  })
+    });
+  });
 
-  it('should arrayify() 3 args', function(done){
+  it('should arrayify() 3 args', done => {
 
-    arrayify(1,2,3,function(err, array){
+    arrayify(1, 2, 3, (err, array) => {
       if (err) {
-        done(err)
+        done(err);
+      } else {
+        assert.deepEqual(array, [1,2,3]);
+        done();
       }
-      assert.deepEqual(array, [1,2,3])
-      done()
-    })
-  })
+    });
+  });
 
-  it('should arrayify() 4 args', function(done){
+  it('should arrayify() 4 args', done => {
 
-    arrayify(1,2,3,4,function(err, array){
+    arrayify(1, 2, 3, 4, (err, array) => {
       if (err) {
-        done(err)
+        done(err);
+      } else {
+        assert.deepEqual(array, [1,2,3,4]);
+        done();
       }
-      assert.deepEqual(array, [1,2,3,4])
-      done()
-    })
-  })
+    });
+  });
 
-  it('should arrayify() falsy args', function(done){
+  it('should arrayify() falsy args', done => {
 
-    arrayify(null, undefined, false,function(err, array){
+    arrayify(null, undefined, false, (err, array) => {
       if (err) {
-        done(err)
+        done(err);
+      } else {
+        assert.deepEqual(array, [null, undefined, false]);
+        done();
       }
-      assert.deepEqual(array, [null, undefined, false])
-      done()
-    })
-  })
-})
+    });
+  });
+});
 
-describe(pkg.name, function(){
+describe(pkg.name, () => {
 
-  describe('bare functions', function(){
+  describe('bare functions', () => {
 
-    it('should work', function(done){
+    it('should work', async function() {
+      const m = await adapt(say, 'hi');
+      assert.equal(m, 'hi');
+    });
 
-      co(function*(){
-        var m = yield adapt(say, 'hi')
-        assert.equal(m, 'hi')
-        done()
-      }).catch(done)
-    })
+    it('should return a promise', () => {
+      const p = adapt(say, 'hi');
+      assert.ok(p.then && typeof p.then === 'function', 'not a promise');
+    });
 
-    it('should return a promise', function(){
+    it('should pass undefined context (in strict mode)', async function() {
+      const self = await adapt(getSelf);
+      assert.strictEqual(self, undefined);
+    });
 
-      var p = adapt(say, 'hi')
-      assert.ok(p.then && typeof p.then === 'function', 'not a promise')
-    })
+    it('should pass 0 arguments', async function() {
+      const array = await adapt(arrayify);
+      assert.deepEqual(array, []);
+    });
 
-    it('should pass undefined context (in strict mode)', function(done){
+    it('should pass 1 argument', async function() {
+      const array = await adapt(arrayify, 'a');
+      assert.deepEqual(array, ['a']);
+    });
 
-      co(function*(){
-        var self = yield adapt(getSelf)
-        assert.strictEqual(self, undefined)
-        done()
-      }).catch(done)
-    })
+    it('should pass 2 arguments', async function() {
+      const array = await adapt(arrayify, 'a', 'b');
+      assert.deepEqual(array, ['a','b']);
+    });
 
-    it('should pass 0 arguments', function(done){
+    it('should pass 3 arguments', async function() {
+      const array = await adapt(arrayify, 'a', 'b', 'c');
+      assert.deepEqual(array, ['a','b','c']);
+    });
 
-      co(function*(){
-        var array = yield adapt(arrayify)
-        assert.deepEqual(array, [])
-        done()
-      }).catch(done)
-    })
+    it('should pass 4 arguments', async function() {
+      const array = await adapt(arrayify, 'a', 'b', 'c', 'd');
+      assert.deepEqual(array, ['a','b','c','d']);
+    });
 
-    it('should pass 1 argument', function(done){
+    it('should pass falsy arguments', async function() {
+      const array = await adapt(arrayify, null, undefined, false);
+      assert.deepEqual(array, [null, undefined, false]);
+    });
 
-      co(function*(){
-        var array = yield adapt(arrayify, 'a')
-        assert.deepEqual(array, ['a'])
-        done()
-      }).catch(done)
-    })
+    it('should error', async function() {
+      await assertAsyncThrows(async function() {
+        await adapt(fail);
+      });
+    });
 
-    it('should pass 2 arguments', function(done){
+    it('should partially apply', async function() {
+      assert.deepEqual(await adapt.part(arrayify,0,1,2,3,4,5,6)(),[0,1,2,3,4,5,6]);
+      assert.deepEqual(await adapt.part(arrayify,0,1,2,3,4,5)(6),[0,1,2,3,4,5,6]);
+      assert.deepEqual(await adapt.part(arrayify,0,1,2,3,4)(5,6),[0,1,2,3,4,5,6]);
+      assert.deepEqual(await adapt.part(arrayify,0,1,2,3)(4,5,6),[0,1,2,3,4,5,6]);
+      assert.deepEqual(await adapt.part(arrayify,0,1,2)(3,4,5,6),[0,1,2,3,4,5,6]);
+      assert.deepEqual(await adapt.part(arrayify,0,1)(2,3,4,5,6),[0,1,2,3,4,5,6]);
+      assert.deepEqual(await adapt.part(arrayify,0)(1,2,3,4,5,6),[0,1,2,3,4,5,6]);
+      assert.deepEqual(await adapt.part(arrayify)(0,1,2,3,4,5,6),[0,1,2,3,4,5,6]);
+      assert.deepEqual(await adapt.part()(arrayify,0,1,2,3,4,5,6),[0,1,2,3,4,5,6]);
+    });
 
-      co(function*(){
-        var array = yield adapt(arrayify, 'a', 'b')
-        assert.deepEqual(array, ['a','b'])
-        done()
-      }).catch(done)
-    })
+    it('partial application should error', async function() {
+      assertAsyncThrows(async function() {
+        await adapt.part()(fail);
+      });
+    });
 
-    it('should pass 3 arguments', function(done){
+    it('partial application should pass undefined context (in strict mode)', async function() {
+      assert.strictEqual(await adapt.part(getSelf)(), undefined);
+      assert.strictEqual(await adapt.part()(getSelf), undefined);
+      assert.strictEqual(await adapt.part(getSelf,1,2,3,4,5,6,7,8,9)(), undefined);
+      assert.strictEqual(await adapt.part()(getSelf,1,2,3,4,5,6,7,8,9), undefined);
+    });
+  });
 
-      co(function*(){
-        var array = yield adapt(arrayify, 'a', 'b', 'c')
-        assert.deepEqual(array, ['a','b','c'])
-        done()
-      }).catch(done)
-    })
+  describe('methods on objects', () => {
 
-    it('should pass 4 arguments', function(done){
+    it('should work', async function() {
+      const fakeLib = { say }
+        , m = await adapt.method(fakeLib, 'say', 'hi');
+      assert.equal(m, 'hi');
+    });
 
-      co(function*(){
-        var array = yield adapt(arrayify, 'a', 'b', 'c', 'd')
-        assert.deepEqual(array, ['a','b','c','d'])
-        done()
-      }).catch(done)
-    })
+    it('should return a promise', () => {
 
-    it('should pass falsy arguments', function(done){
+      const fakeLib = { say }
+        , p = adapt.method(fakeLib, 'say', 'hi');
+      assert.ok(p.then && typeof p.then === 'function', 'not a promise');
+    });
 
-      co(function*(){
-        var array = yield adapt(arrayify, null, undefined, false)
-        assert.deepEqual(array, [null, undefined, false])
-        done()
-      }).catch(done)
-    })
+    it('should pass context', async function() {
+      const fakeLib = { getSelf }
+        , self = await adapt.method(fakeLib, 'getSelf');
+      assert.strictEqual(self, fakeLib);
+    });
 
-    it('should error', function(done){
+    it('should pass 0 arguments', async function() {
+      const fakeLib = { arrayify }
+        , array = await adapt.method(fakeLib, 'arrayify');
+      assert.deepEqual(array, []);
+    });
 
-      co(function*(){
-        yield adapt(fail)
-        done(new Error('failed to fail'))
-      }).catch(function(){
-        done()
-      })
-    })
+    it('should pass 1 argument', async function() {
+      const fakeLib = { arrayify }
+        , array = await adapt.method(fakeLib, 'arrayify', 'a');
+      assert.deepEqual(array, ['a']);
+    });
 
-    it('should partially apply', function(done){
+    it('should pass 2 arguments', async function() {
+      const fakeLib = { arrayify }
+        , array = await adapt.method(fakeLib, 'arrayify', 'a', 'b');
+      assert.deepEqual(array, ['a','b']);
+    });
 
-      co(function*(){
-        assert.deepEqual(yield adapt.part(arrayify,0,1,2,3,4,5,6)(),[0,1,2,3,4,5,6])
-        assert.deepEqual(yield adapt.part(arrayify,0,1,2,3,4,5)(6),[0,1,2,3,4,5,6])
-        assert.deepEqual(yield adapt.part(arrayify,0,1,2,3,4)(5,6),[0,1,2,3,4,5,6])
-        assert.deepEqual(yield adapt.part(arrayify,0,1,2,3)(4,5,6),[0,1,2,3,4,5,6])
-        assert.deepEqual(yield adapt.part(arrayify,0,1,2)(3,4,5,6),[0,1,2,3,4,5,6])
-        assert.deepEqual(yield adapt.part(arrayify,0,1)(2,3,4,5,6),[0,1,2,3,4,5,6])
-        assert.deepEqual(yield adapt.part(arrayify,0)(1,2,3,4,5,6),[0,1,2,3,4,5,6])
-        assert.deepEqual(yield adapt.part(arrayify)(0,1,2,3,4,5,6),[0,1,2,3,4,5,6])
-        assert.deepEqual(yield adapt.part()(arrayify,0,1,2,3,4,5,6),[0,1,2,3,4,5,6])
-        done()
-      }).catch(done)
-    })
+    it('should pass 3 arguments', async function() {
+      const fakeLib = { arrayify }
+        , array = await adapt.method(fakeLib, 'arrayify', 'a', 'b', 'c');
+      assert.deepEqual(array, ['a','b','c']);
+    });
 
-    it('partial application should error', function(done){
+    it('should pass 4 arguments', async function() {
+      const fakeLib = { arrayify }
+        , array = await adapt.method(fakeLib, 'arrayify', 'a', 'b', 'c', 'd');
+      assert.deepEqual(array, ['a','b','c','d']);
+    });
 
-      co(function*(){
-        yield adapt.part()(fail)
-        done(new Error('failed to fail'))
-      }).catch(function(){
-        done()
-      })
-    })
+    it('should pass falsy arguments', async function() {
+      const fakeLib = { arrayify }
+        , array = await adapt.method(fakeLib, 'arrayify',null,undefined,false);
+      assert.deepEqual(array, [null,undefined,false]);
+    });
 
-    it('partial application should pass undefined context (in strict mode)', function(done){
+    it('should error', async function() {
+      const fakeLib = { fail };
+      assertAsyncThrows(async function() {
+        await adapt.method(fakeLib, 'fail');
+      });
+    });
 
-      co(function*(){
-        assert.strictEqual(yield adapt.part(getSelf)(), undefined)
-        assert.strictEqual(yield adapt.part()(getSelf), undefined)
-        assert.strictEqual(yield adapt.part(getSelf,1,2,3,4,5,6,7,8,9)(), undefined)
-        assert.strictEqual(yield adapt.part()(getSelf,1,2,3,4,5,6,7,8,9), undefined)
-        done()
-      }).catch(done)
-    })
-  })
+    it('should partially apply', async function() {
+      assert.deepEqual(await adapt.method.part(arrayifyLib,'arrayify',1,2,3,4,5,6,7,8,9,10)(), [1,2,3,4,5,6,7,8,9,10]);
+      assert.deepEqual(await adapt.method.part(arrayifyLib,'arrayify',1,2,3,4,5,6,7,8,9)(10), [1,2,3,4,5,6,7,8,9,10]);
+      assert.deepEqual(await adapt.method.part(arrayifyLib,'arrayify',1,2,3,4,5,6,7,8)(9,10), [1,2,3,4,5,6,7,8,9,10]);
+      assert.deepEqual(await adapt.method.part(arrayifyLib,'arrayify',1,2,3,4,5,6,7)(8,9,10), [1,2,3,4,5,6,7,8,9,10]);
+      assert.deepEqual(await adapt.method.part(arrayifyLib,'arrayify',1,2,3,4,5,6)(7,8,9,10), [1,2,3,4,5,6,7,8,9,10]);
+      assert.deepEqual(await adapt.method.part(arrayifyLib,'arrayify',1,2,3,4,5)(6,7,8,9,10), [1,2,3,4,5,6,7,8,9,10]);
+      assert.deepEqual(await adapt.method.part(arrayifyLib,'arrayify',1,2,3,4)(5,6,7,8,9,10), [1,2,3,4,5,6,7,8,9,10]);
+      assert.deepEqual(await adapt.method.part(arrayifyLib,'arrayify',1,2,3)(4,5,6,7,8,9,10), [1,2,3,4,5,6,7,8,9,10]);
+      assert.deepEqual(await adapt.method.part(arrayifyLib,'arrayify',1,2)(3,4,5,6,7,8,9,10), [1,2,3,4,5,6,7,8,9,10]);
+      assert.deepEqual(await adapt.method.part(arrayifyLib,'arrayify',1)(2,3,4,5,6,7,8,9,10), [1,2,3,4,5,6,7,8,9,10]);
+      assert.deepEqual(await adapt.method.part(arrayifyLib,'arrayify')(1,2,3,4,5,6,7,8,9,10), [1,2,3,4,5,6,7,8,9,10]);
+      assert.deepEqual(await adapt.method.part(arrayifyLib)('arrayify',1,2,3,4,5,6,7,8,9,10), [1,2,3,4,5,6,7,8,9,10]);
+      assert.deepEqual(await adapt.method.part()(arrayifyLib,'arrayify',1,2,3,4,5,6,7,8,9,10), [1,2,3,4,5,6,7,8,9,10]);
+    });
 
-  describe('methods on objects', function(){
+    it('partial application should error', async function() {
+      const fakeLib = { fail };
+      assertAsyncThrows(async function() {
+        await adapt.part()(fakeLib, 'fail');
+      });
+    });
 
-    it('should work', function(done){
+    it('partial application should pass context', async function() {
+      const fakeLib = { getSelf };
+      assert.strictEqual(await adapt.method.part(fakeLib, 'getSelf')(), fakeLib);
+      assert.strictEqual(await adapt.method.part(fakeLib)('getSelf'), fakeLib);
+      assert.strictEqual(await adapt.method.part()(fakeLib, 'getSelf'), fakeLib);
+      assert.strictEqual(await adapt.method.part()(fakeLib, 'getSelf',1,2,3,4,5,6,7,8), fakeLib);
+      assert.strictEqual(await adapt.method.part(fakeLib, 'getSelf',1,2,3,4,5,6,7,8)(), fakeLib);
+    });
+  });
 
-      co(function*(){
-        var fakeLib = { say: say }
-        var m = yield adapt.method(fakeLib, 'say', 'hi')
-        assert.equal(m, 'hi')
-        done()
-      }).catch(done)
-    })
+  describe('library promisification', () => {
 
-    it('should return a promise', function(){
-
-      var fakeLib = { say: say }
-      var p = adapt.method(fakeLib, 'say', 'hi')
-      assert.ok(p.then && typeof p.then === 'function', 'not a promise')
-    })
-
-    it('should pass context', function(done){
-
-      co(function*(){
-        var fakeLib = { getSelf: getSelf }
-        var self = yield adapt.method(fakeLib, 'getSelf')
-        assert.strictEqual(self, fakeLib)
-        done()
-      }).catch(done)
-    })
-
-    it('should pass 0 arguments', function(done){
-
-      co(function*(){
-        var fakeLib = { arrayify: arrayify }
-        var array = yield adapt.method(fakeLib, 'arrayify')
-        assert.deepEqual(array, [])
-        done()
-      }).catch(done)
-    })
-
-    it('should pass 1 argument', function(done){
-
-      co(function*(){
-        var fakeLib = { arrayify: arrayify }
-        var array = yield adapt.method(fakeLib, 'arrayify', 'a')
-        assert.deepEqual(array, ['a'])
-        done()
-      }).catch(done)
-    })
-
-    it('should pass 2 arguments', function(done){
-
-      co(function*(){
-        var fakeLib = { arrayify: arrayify }
-        var array = yield adapt.method(fakeLib, 'arrayify', 'a', 'b')
-        assert.deepEqual(array, ['a','b'])
-        done()
-      }).catch(done)
-    })
-
-    it('should pass 3 arguments', function(done){
-
-      co(function*(){
-        var fakeLib = { arrayify: arrayify }
-        var array = yield adapt.method(fakeLib, 'arrayify', 'a', 'b', 'c')
-        assert.deepEqual(array, ['a','b','c'])
-        done()
-      }).catch(done)
-    })
-
-    it('should pass 4 arguments', function(done){
-
-      co(function*(){
-        var fakeLib = { arrayify: arrayify }
-        var array = yield adapt.method(fakeLib, 'arrayify', 'a', 'b', 'c', 'd')
-        assert.deepEqual(array, ['a','b','c','d'])
-        done()
-      }).catch(done)
-    })
-
-    it('should pass falsy arguments', function(done){
-
-      co(function*(){
-        var fakeLib = { arrayify: arrayify }
-        var array = yield adapt.method(fakeLib, 'arrayify',null,undefined,false)
-        assert.deepEqual(array, [null,undefined,false])
-        done()
-      }).catch(done)
-    })
-
-    it('should error', function(done){
-
-      co(function*(){
-        var fakeLib = { fail: fail }
-        yield adapt.method(fakeLib, 'fail')
-        done(new Error('failed to fail'))
-      }).catch(function(){
-        done()
-      })
-    })
-
-    it('should partially apply', function(done){
-
-      co(function*(){
-        assert.deepEqual(yield adapt.method.part(arrayifyLib,'arrayify',1,2,3,4,5,6,7,8,9,10)(), [1,2,3,4,5,6,7,8,9,10])
-        assert.deepEqual(yield adapt.method.part(arrayifyLib,'arrayify',1,2,3,4,5,6,7,8,9)(10), [1,2,3,4,5,6,7,8,9,10])
-        assert.deepEqual(yield adapt.method.part(arrayifyLib,'arrayify',1,2,3,4,5,6,7,8)(9,10), [1,2,3,4,5,6,7,8,9,10])
-        assert.deepEqual(yield adapt.method.part(arrayifyLib,'arrayify',1,2,3,4,5,6,7)(8,9,10), [1,2,3,4,5,6,7,8,9,10])
-        assert.deepEqual(yield adapt.method.part(arrayifyLib,'arrayify',1,2,3,4,5,6)(7,8,9,10), [1,2,3,4,5,6,7,8,9,10])
-        assert.deepEqual(yield adapt.method.part(arrayifyLib,'arrayify',1,2,3,4,5)(6,7,8,9,10), [1,2,3,4,5,6,7,8,9,10])
-        assert.deepEqual(yield adapt.method.part(arrayifyLib,'arrayify',1,2,3,4)(5,6,7,8,9,10), [1,2,3,4,5,6,7,8,9,10])
-        assert.deepEqual(yield adapt.method.part(arrayifyLib,'arrayify',1,2,3)(4,5,6,7,8,9,10), [1,2,3,4,5,6,7,8,9,10])
-        assert.deepEqual(yield adapt.method.part(arrayifyLib,'arrayify',1,2)(3,4,5,6,7,8,9,10), [1,2,3,4,5,6,7,8,9,10])
-        assert.deepEqual(yield adapt.method.part(arrayifyLib,'arrayify',1)(2,3,4,5,6,7,8,9,10), [1,2,3,4,5,6,7,8,9,10])
-        assert.deepEqual(yield adapt.method.part(arrayifyLib,'arrayify')(1,2,3,4,5,6,7,8,9,10), [1,2,3,4,5,6,7,8,9,10])
-        assert.deepEqual(yield adapt.method.part(arrayifyLib)('arrayify',1,2,3,4,5,6,7,8,9,10), [1,2,3,4,5,6,7,8,9,10])
-        assert.deepEqual(yield adapt.method.part()(arrayifyLib,'arrayify',1,2,3,4,5,6,7,8,9,10), [1,2,3,4,5,6,7,8,9,10])
-        done()
-      }).catch(done)
-    })
-
-    it('partial application should error', function(done){
-
-      co(function*(){
-        var fakeLib = { fail: fail }
-        yield adapt.part()(fakeLib, 'fail')
-        done(new Error('failed to fail'))
-      }).catch(function(){
-        done()
-      })
-    })
-
-    it('partial application should pass context', function(done){
-
-      co(function*(){
-        var fakeLib = { getSelf: getSelf }
-        assert.strictEqual(yield adapt.method.part(fakeLib, 'getSelf')(), fakeLib)
-        assert.strictEqual(yield adapt.method.part(fakeLib)('getSelf'), fakeLib)
-        assert.strictEqual(yield adapt.method.part()(fakeLib, 'getSelf'), fakeLib)
-        assert.strictEqual(yield adapt.method.part()(fakeLib, 'getSelf',1,2,3,4,5,6,7,8), fakeLib)
-        assert.strictEqual(yield adapt.method.part(fakeLib, 'getSelf',1,2,3,4,5,6,7,8)(), fakeLib)
-        done()
-      }).catch(done)
-    })
-  })
-
-  describe('library promisification', function() {
-
-    it('should promisify all of fs', co.wrap(function*() {
-      var pfs = adapt.promify(fs);
-      var stat = yield pfs.stat(__dirname);
+    it('should promisify all of fs', async function() {
+      const pfs = adapt.promify(fs)
+        , stat = await pfs.stat(__dirname);
       assert.ok(stat.isDirectory());
       assert.strictEqual(typeof pfs.readdir, 'function');
       assert.strictEqual(typeof pfs.readFile, 'function');
-    }));
+    });
 
-    it('should promisify named methods of fs', co.wrap(function*() {
-      var pfs = adapt.promify(fs, 'stat', 'readdir');
-      var stat = yield pfs.stat(__dirname);
+    it('should promisify named methods of fs', async function() {
+      const pfs = adapt.promify(fs, 'stat', 'readdir')
+        , stat = await pfs.stat(__dirname);
       assert.ok(stat.isDirectory());
       assert.strictEqual(typeof pfs.readdir, 'function');
       assert.strictEqual(typeof pfs.readFile, 'undefined');
-    }));
+    });
 
-    it('should promisify a fake lib', co.wrap(function*() {
-      var fakeLib = {
-        qux: function() {},
-      };
-      var pFakeLib = adapt.promify(fakeLib);
+    it('should promisify a fake lib', () => {
+      const fakeLib = { qux: () => {} }
+        , pFakeLib = adapt.promify(fakeLib);
       assert.strictEqual(typeof pFakeLib.qux, 'function');
-    }));
+    });
 
-    it('should carry over non-functions', co.wrap(function*() {
-      var fakeLib = {
+    it('should carry over non-functions', () => {
+      const fakeLib = {
         foo: 'bar',
-        qux: function() {},
+        qux: () => {},
       };
-      var pFakeLib = adapt.promify(fakeLib);
+      const pFakeLib = adapt.promify(fakeLib);
       assert.strictEqual(pFakeLib.foo, 'bar');
-    }));
+    });
   });
 });
 
