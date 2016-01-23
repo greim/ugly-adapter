@@ -1,7 +1,7 @@
 # Universal Callback => Promise Adapter
 
-With [ES7 async functions](https://jakearchibald.com/2014/es7-async-functions/) gaining prominence, the JavaScript world is poised to transition to promises.
-That means we need a way to *promisify* callback-based APIs.
+With [Koa](http://koajs.com/) and [ES7 async functions](https://jakearchibald.com/2014/es7-async-functions/) gaining prominence, the JavaScript world is poised to transition to promises.
+That means we need a sane way to *promisify* callback-based APIs.
 Rather than importing lots of different promisification wrappers for each API, this lib provides a single way to promisify every API.
 
 ## Install
@@ -14,9 +14,8 @@ npm install ugly-adapter
 
 ```js
 import adapt from 'ugly-adapter';
-adapt(fs.readFile, './data.txt', 'utf8').then(data => {
-  // do something with `data`
-});
+...
+var data = await adapt(fs.readFile, './data.txt', 'utf8');
 ```
 
 This lib also exposes methods to make partial application easier.
@@ -24,8 +23,8 @@ Which is useful if you want to re-use an adapted version of a function.
 
 ```js
 var read = adapt.part(fs.readFile);
-await read('./data1', 'utf8').then(...);
-await read('./data2', 'utf8').then(...);
+var data1 = await read('./data1', 'utf8');
+var data2 = await read('./data2', 'utf8');
 ```
 
 # API

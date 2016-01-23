@@ -50,6 +50,6 @@
     "no-process-exit": 0,
     "semi": 1,
     "key-spacing": 0,
-    "no-var": 1
+    "no-var": 0
   }
 }
