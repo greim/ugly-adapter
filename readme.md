@@ -100,7 +100,7 @@ var promise = adapt.part()(a,b,c);
 
 ## Promify a library: `adapt.promify(lib)`
 
-You can "promify" entire library modules, such as `fs`.
+When a module is a namespace object with functions on it—such as `fs`—you can "promify" it.
 It will return an object with all the same properties and functions.
 The functions have the same signature—sans callback—and return promises.
 
