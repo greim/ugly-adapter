@@ -132,3 +132,7 @@ async function jsonReadFile(path, encoding) {
   return data;
 }
 ```
+
+# Any Promise
+
+Ugly adapter uses [any-promise](https://github.com/kevinbeaty/any-promise) promises. This is something you can safely ignore and everything works normally. However, if you want to polyfill/replace your environment's Promise for whatever reason, this allows you swap in whatever conforming Promise you want and this library will use it.

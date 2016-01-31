@@ -5,7 +5,7 @@
 
 'use strict';
 
-var MyPromise = require('native-or-bluebird');
+var MyPromise = require('any-promise');
 var slice = Array.prototype.slice;
 
 /*
