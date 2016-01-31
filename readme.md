@@ -1,8 +1,8 @@
 # Universal Callback => Promise Adapter
 
 With [Koa](http://koajs.com/) and [ES7 async functions](https://jakearchibald.com/2014/es7-async-functions/) gaining prominence, the JavaScript world is poised to transition to promises.
-That means we need a sane way to *promisify* callback-based APIs.
-Rather than importing lots of different promisification wrappers for each API, this lib provides a single way to promisify every API.
+That means we need a sane way to convert callback-based APIs to promise-based ones.
+Rather than using lots of different wrappers, each specific to a different API, this lib provides a single way to convert any API that adheres to the error-first callback convention which is practically universal in Node.
 
 ## Install
 
@@ -13,19 +13,23 @@ npm install ugly-adapter
 ## Use
 
 ```js
-import adapt from 'ugly-adapter';
-...
-var data = await adapt(fs.readFile, './data.txt', 'utf8');
+var fs = require('ugly-adapter');
+var adapt = require('ugly-adapter');
+
+// ...using callbacks
+fs.readFile('./data.txt', 'utf8', (err, data) => {
+  if (err) { handle(err); }
+  else { doStuffWith(data); }
+});
+
+// ...using promises
+adapt(fs.readFile, './data.txt', 'utf8').then(
+  data => doStuffWith(data),
+  err => handle(err)
+);
 ```
 
-This lib also exposes methods to make partial application easier.
-Which is useful if you want to re-use an adapted version of a function.
-
-```js
-var read = adapt.part(fs.readFile);
-var data1 = await read('./data1', 'utf8');
-var data2 = await read('./data2', 'utf8');
-```
+There's more stuff in the API, but that's the gist.
 
 # API
 
@@ -35,90 +39,91 @@ Useful when you don't think a function cares about `this`.
 
 ```js
 // signature
-var promise = adapt(<function>, ...args)
+var promise = adapt(<function>, ...args);
 
-// fs.readFile(path, enc, callback) example
-adapt(fs.readFile, './data.txt', 'utf8').then(...)
+// example
+var promise = adapt(fs.readFile, './data.txt', 'utf8');
 ```
 
 ## Call a method on an object: `adapt.method()`
 
-Useful when you think a function definitely cares about `this`.
+Useful when you think a function cares about `this`.
 
 ```js
 // signature
-var promise = adapt.method(<object>, <string>, ...args)
+var promise = adapt.method(<object>, <string>, ...args);
 
-// user.authenticate(opts, callback) example
-var user = new User()
-adapt.method(user, 'authenticate', {
+// example
+var user = new User();
+var promise = adapt.method(user, 'authenticate', {
   userName: userName,
   password: password
-}).then(...)
+});
 ```
 
 ## Partially apply a bare function: `adapt.part()`
 
 ```js
 // signature
-var fn = adapt.part(<function>, ...args)
+var fn = adapt.part(<function>, ...args);
 
 // example
-var stat = adapt.part(fs.stat, './data.txt', 'utf8')
-stat().then(...)
+var stat = adapt.part(fs.stat, './data.txt', 'utf8');
+var promise = stat();
 ```
 
 ## Partially apply a method on an object: `adapt.method.part()`
 
 ```js
 // signature
-var fn = adapt.method.part(<object>, <string>, ...args)
+var fn = adapt.method.part(<object>, <string>, ...args);
 
 // example
-var user = new User()
-var authenticate = adapt.method.part(user, 'authenticate')
-authenticate({
+var user = new User();
+var authenticate = adapt.method.part(user, 'authenticate');
+var promise = authenticate({
   userName: userName,
   password: password
-}).then(...)
+});
 ```
 
 A note about partial application.
-You can basically move the `)(` around willy-nilly.
+You can essentially move the `)(` around willy-nilly.
+All of these behave identically:
 
 ```js
-// these behave identically
-var promise = adapt.part(a,b,c)()
-var promise = adapt.part(a,b)(c)
-var promise = adapt.part(a)(b,c)
-var promise = adapt.part()(a,b,c)
+var promise = adapt.part(a,b,c)();
+var promise = adapt.part(a,b)(c);
+var promise = adapt.part(a)(b,c);
+var promise = adapt.part()(a,b,c);
 ```
 
 ## Promify a library: `adapt.promify(lib)`
 
-You can promisify entire library modules, such as `fs`.
+You can "promify" entire library modules, such as `fs`.
 It will return an object with all the same properties and functions.
 The functions have the same signature—sans callback—and return promises.
 
 ```js
-var adapt = require('ugly-adapter')
-  , callbackFs = require('fs')
-  , fs = adapt.promify(callbackFs);
-
-fs.stat(...).then(...);
+import adapt from 'ugly-adapter');
+import fscb = from 'fs';
+var fs = adapt.promify(fs);
+...
+await fs.stat('./data.txt');
+var data = await fs.readFile('./data.txt', 'utf8');
+await fs.unlink('./data.txt');
 ```
 
-The above promifies every function in the `fs` module.
-If you only want to promify a subset of functions, declare them in a whitelist.
+Alternatively, declare a whitelist to of functions to be converted:
 
 ```js
-var adapt = require('ugly-adapter')
-  , callbackFs = require('fs')
-  , fs = adapt.promify(callbackFs, 'stat', 'readFile');
-
-fs.stat(...).then(...);
-fs.readFile(...).then(...);
-fs.link(...).then(...); // error, wasn't in the whitelist!
+import adapt from 'ugly-adapter');
+import fscb = from 'fs';
+var fs = adapt.promify(fs, 'stat', 'readFile'); // <-- whitelist
+...
+await fs.stat('./data.txt');
+var data = await fs.readFile('./data.txt', 'utf8');
+await fs.unlink('./data.txt'); // error, not in whitelist!
 ```
 
 # Async/Await Example
@@ -135,4 +140,6 @@ async function jsonReadFile(path, encoding) {
 
 # Any Promise
 
-Ugly adapter uses [any-promise](https://github.com/kevinbeaty/any-promise) promises. This is something you can safely ignore and everything works normally. However, if you want to polyfill/replace your environment's Promise for whatever reason, this allows you swap in whatever conforming Promise you want and this library will use it.
+The ugly adapter uses [any-promise](https://github.com/kevinbeaty/any-promise) promises.
+This is something you can safely ignore and everything works normally.
+However, if you want to polyfill/replace your environment's Promise for whatever reason, this allows you swap in whatever conforming Promise you want and this library will use it.
