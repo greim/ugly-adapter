@@ -32,7 +32,7 @@
   "author": "gregreimer@gmail.com",
   "license": "MIT",
   "dependencies": {
-    "any-promise": "^0.2.0"
+    "any-promise": "^1.0.0"
   },
   "devDependencies": {
     "babel": "^5.8.23",
