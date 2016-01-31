@@ -102,7 +102,7 @@ var promise = adapt.part()(a,b,c);
 
 When a module is a namespace object with functions on it—such as `fs`—you can "promify" it.
 It will return an object with all the same properties and functions.
-The functions have the same signature—sans callback—and return promises.
+The functions return promises and have the same signature, except for the callbacks.
 
 ```js
 import adapt from 'ugly-adapter');
