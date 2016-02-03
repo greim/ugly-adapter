@@ -31,6 +31,20 @@ adapt(fs.readFile, './data.txt', 'utf8').then(
 
 There's more stuff in the API, but that's the gist.
 
+# Error handling
+
+Some Node.js error-first callback API functions sometimes have dual error handling behavior if things go wrong, like so:
+
+```js
+// throws synchronously
+foo.bar('invalid', 'arguments', function(err, result) {});
+
+// calls back with err
+foo.bar('valid', 'arguments', function(err, result) {});
+```
+
+Ugly adapter behaves the same in either case—a rejected promise—in order to facilitate a single error handling path.
+
 # API
 
 ## Call a bare function: `adapt()`

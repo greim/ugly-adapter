@@ -43,6 +43,16 @@ function arrayify() {
   });
 }
 
+function errorTestCallbackFn(errorType, cb) {
+  if (errorType === 'programmer') {
+    throw new Error('Programmer error!');
+  } else if (errorType === 'runtime') {
+    cb(new Error('Runtime error!'));
+  } else {
+    cb(null, true);
+  }
+}
+
 const arrayifyLib = { arrayify };
 
 describe('test helpers', () => {
@@ -151,6 +161,28 @@ describe('test helpers', () => {
       }
     });
   });
+
+  it('errorTestCallbackFn should throw programmer errors', () => {
+    assert.throws(() => {
+      errorTestCallbackFn('programmer', () => {});
+    });
+  });
+
+  it('errorTestCallbackFn should cb with runtime error', done => {
+    errorTestCallbackFn('runtime', (err, val) => {
+      assert(!!err, 'no error');
+      assert(!val, 'found value');
+      done();
+    });
+  });
+
+  it('errorTestCallbackFn should cb success with no error', done => {
+    errorTestCallbackFn('no error', (err, val) => {
+      assert.ifError(err);
+      assert(val, 'missing value');
+      done();
+    });
+  });
 });
 
 describe(pkg.name, () => {
@@ -231,6 +263,22 @@ describe(pkg.name, () => {
       assert.strictEqual(await adapt.part()(getSelf), undefined);
       assert.strictEqual(await adapt.part(getSelf,1,2,3,4,5,6,7,8,9)(), undefined);
       assert.strictEqual(await adapt.part()(getSelf,1,2,3,4,5,6,7,8,9), undefined);
+    });
+
+    it('should forward programmer errors to rejections', done => {
+      var prom = adapt(errorTestCallbackFn, 'programmer');
+      prom.then(
+        val => done(new Error('did not expect success')),
+        err => done()
+      );
+    });
+
+    it('should forward runtime errors to rejections', done => {
+      var prom = adapt(errorTestCallbackFn, 'runtime');
+      prom.then(
+        val => done(new Error('did not expect success')),
+        err => done()
+      );
     });
   });
 
@@ -329,6 +377,24 @@ describe(pkg.name, () => {
       assert.strictEqual(await adapt.method.part()(fakeLib, 'getSelf',1,2,3,4,5,6,7,8), fakeLib);
       assert.strictEqual(await adapt.method.part(fakeLib, 'getSelf',1,2,3,4,5,6,7,8)(), fakeLib);
     });
+
+    it('should forward programmer errors to rejections', done => {
+      const foo = { errorTestCallbackFn };
+      var prom = adapt.method(foo, 'errorTestCallbackFn', 'programmer');
+      prom.then(
+        val => done(new Error('did not expect success')),
+        err => done()
+      );
+    });
+
+    it('should forward runtime errors to rejections', done => {
+      const foo = { errorTestCallbackFn };
+      var prom = adapt.method(foo, 'errorTestCallbackFn', 'runtime');
+      prom.then(
+        val => done(new Error('did not expect success')),
+        err => done()
+      );
+    });
   });
 
   describe('library promisification', () => {
@@ -365,4 +431,3 @@ describe(pkg.name, () => {
     });
   });
 });
-
